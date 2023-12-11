@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.21)
+
+include(pico_sdk_import.cmake)
+
+project(pico_project)
+
+
+
+pico_sdk_init()
+
+add_executable(main
+	main.c
+)
+
+
+
+target_link_libraries(main
+    pico_stdio pico_stdlib pico_malloc
+)
+
+
+
+pico_enable_stdio_usb(main 1)
+
+pico_enable_stdio_uart(main 0)
+
+pico_add_extra_outputs(main)
+
+
+
+include_directories(
+    "C/Users/User/pico-project/pico_server"
+)
+include_directories(
+    "C:/Users/User/Documents/CodeBlocks/[TRIVIAL]-1"
+)
