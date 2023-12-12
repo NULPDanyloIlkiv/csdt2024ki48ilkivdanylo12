@@ -1,89 +1,55 @@
-#include <iostream>
+#include "engine.h"
+
 #include <cassert>
 
-#include "serial_port.h"
-#define _PORT_ID_ (wchar_t*)L"COM4"
+/**
+ * @file
+ *
+ * @brief main.cpp
+ *
+ * this file stores the entry point of the client application
+ */
 
-#include "timer.h"
+/**
+ * @brief client application for the "checkers" game on pico
+ * @author Ilkiv Danylo KI-48
+ *
+ * @version v1.0.0
+ * @date 12/12/24
+ *
+ * @warning for the application to work, it is necessary to connect the "RP PICO" microcontroller with the server application recorded on it to the COM port!
+ */
 
-#define _MSG_SIZE_ 128
+//! TMain is a macro that refers to the entry point of a desktop program (WinMain)
+int TMain(TParam) {
+	UNREFERENCED_PARAMETER(hNULLInstance);
 
-void _open_(
-    _SERIAL_PORT_* _port_
-)
-{
-    _com_open_(_port_);
+	//! create a console to direct the I/O stream
+	Helper::CreateConsole();
 
-    assert(
-        _port_->hPort != INVALID_HANDLE_VALUE
+	_cEngine_ eng(
+        hInstance, nCmdShow
     );
 
-    _com_setup_(
-        _port_, CBR_115200
+    //! create a window class and register it in OS
+	eng.CreateC(
+        (LPWSTR)L"_WndClass_", LoadCursor(NULL, IDC_HAND)
     );
 
-    _com_mask_(
-        _port_, EV_RXCHAR
-    );
-}
-void _close_(
-    _SERIAL_PORT_* _port_
-) {
-    _com_close_(_port_);
-}
-
-void _ping_(
-    _SERIAL_PORT_* _port_
-) {
-    char _char_[
-        _MSG_SIZE_
-    ] = "__HELLO_FROM_CLIENT__";
-
-    size_t _bytes_send_ = _com_send_(
-        _port_, _char_, 0x1, sizeof(_char_)
+    //! create a overlapping window
+	eng.CreateW(
+        (LPWSTR)L"[Checkers]",
+             nWindowWidth, nWindowHeight, WS_OVERLAPPEDWINDOW | WS_VISIBLE
     );
 
-    fwprintf(stderr,
-        L"__BYTES_SEND__ : %i | _CHAR_ : %s\n", _bytes_send_, _char_
+	DWORD dwResult = ERROR_SUCCESS;
+
+	//! start a loop of dispatching and sending window messages
+	dwResult = eng.Start();
+
+	assert(
+        dwResult == ERROR_SUCCESS
     );
 
-
-
-    memset(
-        _char_, '\0', sizeof(_char_)
-    );
-
-
-
-    size_t _bytes_recv_ = _com_recv_(
-        _port_, _char_, 0x1, sizeof(_char_)
-    );
-
-    fwprintf(stderr,
-        L"__BYTES_RECV__ : %i | _CHAR_ : %s\n", _bytes_recv_, _char_
-    );
-}
-
-int main(void) {
-    _SERIAL_PORT_ m_sp = { _PORT_ID_ };
-
-    _open_(&m_sp);
-
-    _cTimer_ _timer_;
-
-    while(0x1) {
-        _timer_._begin_();
-
-            Sleep(128); _ping_(&m_sp); Sleep(128);
-
-        _timer_._end_();
-
-        fwprintf(
-            stderr, L"__ELAPSED_TIME__ : %Lf\n", _timer_._elapsed_time_()
-        );
-    }
-
-    _close_(&m_sp);
-
-    return(0x0);
+	return(dwResult);
 }

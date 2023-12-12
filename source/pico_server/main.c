@@ -5,31 +5,25 @@
 
 const int _gLED_PIN_ = PICO_DEFAULT_LED_PIN;
 
-#include "serial_port.h"
-#define _MSG_SIZE_ 128
+#include "server.h"
 
-void _ping_(void) {
-    char _char_[
-        _MSG_SIZE_
-    ];
+/**
+ * @file
+ *
+ * @brief main.c
+ *
+ * this file stores the entry point of the server application
+ */
 
-    (void)_com_recv_(
-        _char_, 0x1, sizeof(_char_)
-    );
+ /**
+ * @brief server application for the "checkers" game on pico
+ * @author Ilkiv Danylo KI-48
+ *
+ * @version v1.0.0
+ * @date 12/12/24
+ */
 
-    memset(
-        _char_, '\0', sizeof(_char_)
-    );
-
-    strcpy(
-        _char_, "__HELLO_FROM_SERVER__"
-    );
-
-    (void)_com_send_(
-        _char_, 0x1, sizeof(_char_)
-    );
-}
-
+//! entry point to the application
 int main() {
     stdio_init_all();
 
@@ -42,14 +36,17 @@ int main() {
         _gLED_PIN_, 0x1
     );
 
-    while(0x1) {
-        _ping_();
-    }
+
+    //! main loop
+    _server_loop_();
+
+
 
     gpio_put(
         _gLED_PIN_, 0x0
     );
 
+    //! reboot...
     reset_usb_boot(
         0x0, 0b0001
     );

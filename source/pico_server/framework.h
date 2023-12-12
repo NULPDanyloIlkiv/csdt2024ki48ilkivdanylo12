@@ -1,6 +1,8 @@
 #ifndef _FRAMEWORK_H_
 #define _FRAMEWORK_H_
 
+#include <math.h>
+
 #include <string.h>
 
 #include <stdio.h>
