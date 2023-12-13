@@ -5,7 +5,7 @@
  *
  * @brief serial_port.h
  *
- * this file stores the implementation of functions for working with the COM port data stream
+ * this file stores the implementation of functions for server operations
  */
 
 /**

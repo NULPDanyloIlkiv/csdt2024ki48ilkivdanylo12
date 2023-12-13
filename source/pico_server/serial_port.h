@@ -3,6 +3,12 @@
 
 #include "framework.h"
 
+/**
+ * @file
+ *
+ * @brief serial_port.h
+ */
+
 //! reading bytes from the COM port data stream
 size_t _com_recv_(
     void* _buffer_, size_t _cnt_, size_t _size_

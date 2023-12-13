@@ -1,5 +1,11 @@
 #pragma once
 
+/**
+ * @file
+ *
+ * @brief vec2.h
+ */
+
 struct vec2i; struct vec2f;
 
 struct vec2i {

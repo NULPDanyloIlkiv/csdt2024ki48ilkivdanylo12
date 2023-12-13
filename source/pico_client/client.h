@@ -8,8 +8,15 @@
 
 #include <vector>
 
+/**
+ * @file
+ *
+ * @brief client.h
+ */
+
 #define _COM_PORT_
 
+//! a structure describing a object the client is working with
 struct _sObject_ {
     vec2f
         vOldPos = { 0.f },

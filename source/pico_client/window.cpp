@@ -1,5 +1,11 @@
 #include "window.h"
 
+/**
+ * @file
+ *
+ * @brief window.cpp
+ */
+
 _cWindow_::_cWindow_(void) :
 	_cWindow_(GetModuleHandle(NULL), SW_SHOWNORMAL)
 { /*Code...*/ }

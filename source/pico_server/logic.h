@@ -5,7 +5,11 @@
 
 #include "data.h"
 
-
+/**
+ * @file
+ *
+ * @brief logic.h
+ */
 
 //! board size N x N
 const size_t _gSIZE_ = 0xA;

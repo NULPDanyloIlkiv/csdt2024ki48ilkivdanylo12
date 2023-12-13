@@ -1,5 +1,11 @@
 #include "opengl.h"
 
+/**
+ * @file
+ *
+ * @brief opengl.cpp
+ */
+
 //! enable OpenGL for the window
 void _EnableOpenGL_(
     HWND hwnd, HDC* hDC, HGLRC* hRC

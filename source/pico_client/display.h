@@ -20,6 +20,12 @@
 #define GDI_INVERT_Y_AXIS
 #endif
 
+/**
+ * @file
+ *
+ * @brief display.h
+ */
+
 class _cDisplay_ {
 
 protected:

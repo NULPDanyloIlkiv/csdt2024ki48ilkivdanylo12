@@ -1,5 +1,11 @@
 #include "helper.h"
 
+/**
+ * @file
+ *
+ * @brief helper.cpp
+ */
+
 Helper::Helper(void)
 { m_hwnd = NULL; m_regparam = { 0x0 }; }
 Helper::~Helper(void)

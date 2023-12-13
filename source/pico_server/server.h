@@ -1,7 +1,13 @@
-#ifndef _GAME_H_
-#define _GAME_H_
+#ifndef _SERVER_H_
+#define _SERVER_H_
 
 #include "framework.h"
+
+/**
+ * @file
+ *
+ * @brief server.h
+ */
 
 //! allocate memory and initialize attributes
 bool _server_create_(void);
@@ -41,4 +47,4 @@ bool _server_update_(_KEY_ _key_);
 
 void _server_loop_(void);
 
-#endif // _GAME_H_
+#endif // _SERVER_H_

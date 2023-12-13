@@ -3,6 +3,12 @@
 
 #include "framework.h"
 
+/**
+ * @file
+ *
+ * @brief serial_port.h
+ */
+
 //! a structure, which stores everything necessary for working with the data stream of COM port
 struct _sSerialPort_ {
     const wchar_t*

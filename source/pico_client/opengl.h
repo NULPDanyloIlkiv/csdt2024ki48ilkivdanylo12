@@ -4,6 +4,12 @@
 #include <windows.h>
 #include <gl/gl.h>
 
+/**
+ * @file
+ *
+ * @brief opengl.h
+ */
+
 //! enable OpenGL for the window
 void _EnableOpenGL_(
     HWND hwnd, HDC* hDC, HGLRC* hRC

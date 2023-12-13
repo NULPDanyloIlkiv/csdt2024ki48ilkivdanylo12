@@ -1,5 +1,11 @@
 #include "vec2.h"
 
+/**
+ * @file
+ *
+ * @brief vec2.cpp
+ */
+
 vec2i::vec2i(void) : x(0x0), y(0x0) { /*Code...*/ }
 vec2i::vec2i(int val) : x(val), y(val) { /*Code...*/ }
 vec2i::vec2i(int _x, int _y) : x(_x), y(_y) { /*Code...*/ }

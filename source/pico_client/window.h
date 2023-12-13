@@ -4,6 +4,12 @@
 
 #include "framework.h"
 
+/**
+ * @file
+ *
+ * @brief window.h
+ */
+
 class _cWindow_ {
 	static LRESULT CALLBACK WindowProc(_In_ HWND hWnd,
 		_In_ UINT uMessage,

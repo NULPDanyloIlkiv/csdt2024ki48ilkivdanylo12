@@ -1,6 +1,14 @@
 #ifndef _TRIVIAL_FRAMEWORK_H_
 #define _TRIVIAL_FRAMEWORK_H_
 
+/**
+ * @file
+ *
+ * @brief framework.h
+ *
+ * a set of header (.h) files using in the project
+ */
+
 #ifndef __cplusplus
 #error Error! :: Please use the "C++"
 #endif

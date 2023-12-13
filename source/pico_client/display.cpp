@@ -1,5 +1,11 @@
 #include "display.h"
 
+/**
+ * @file
+ *
+ * @brief display.cpp
+ */
+
 _cDisplay_::_cDisplay_(HDC hDC, POINT pRes) :
 	m_resolution(pRes)
 {

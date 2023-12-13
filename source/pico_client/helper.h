@@ -5,6 +5,12 @@
 
 #define HPRINT(_data_) std::wcout << _data_ << std::endl;
 
+/**
+ * @file
+ *
+ * @brief helper.h
+ */
+
 class Helper {
 	HWND m_hwnd;
 	struct sRegParam {

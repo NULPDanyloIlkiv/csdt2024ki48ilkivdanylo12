@@ -4,6 +4,12 @@
 
 #include "vec2.h"
 
+/**
+ * @file
+ *
+ * @brief vecfunctions.h
+ */
+
 float clamp(float value, float min, float max);
 float sign(float a);
 float step(float edge, float x);

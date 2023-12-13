@@ -4,6 +4,12 @@
 
 #include "logic.h"
 
+/**
+ * @file
+ *
+ * @brief server.c
+ */
+
 static _MASK_MOVE_ _mask_move_ = { 0x0, NULL };
 static _MASK_JUMP_ _mask_jump_ = { 0x0, NULL };
 

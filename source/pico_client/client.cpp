@@ -5,6 +5,14 @@
 
 #define _COM_PORT_
 
+/**
+ * @file
+ *
+ * @brief client.cpp
+ *
+ * this file stores the implementation of the client class that implements the client
+ */
+
 int8_t _cClient_::_map_w_(void) const
 { return(m_nMapW); }
 int8_t _cClient_::_map_h_(void) const
@@ -161,7 +169,7 @@ void _cClient_::_game_init_(void) {
 
 
 
-//! send a message that stores [key + data] indicating a move made by a player
+//! send a message that stores [key + data] indicating the execution of a player move
 void _cClient_::_step_(_POINT_& _point_) {
     size_t _bytes_recv_ = 0x0;
 
@@ -197,7 +205,7 @@ void _cClient_::_step_(_POINT_& _point_) {
 
 
 
-//! implements the start and finish of a move made by a player
+//! implements the start and finish of the execution of a player move
 void _cClient_::_step_make_(
     _KEY_ _key_, _POINT_ _point_
 )
@@ -217,7 +225,7 @@ void _cClient_::_step_make_(
 
 
 
-//! send a message that stores [key + data] indicating a move made by a bot
+//! send a message that stores a [key + data] indicating the execution of a bot move
 void _cClient_::_step_bot_(void) {
     /*Code...*/
 }
