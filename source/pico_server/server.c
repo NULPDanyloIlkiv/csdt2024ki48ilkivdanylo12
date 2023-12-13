@@ -147,6 +147,8 @@ bool _server_step_make_new_(void) {
     (void)_com_send_data_(
         _kSTEP_MAKE_NEW_, &_new_, 0x1, sizeof(_new_)
     );
+
+    return(true);
 }
 
 //! execute a bot move and save it -> _old_ | _new_

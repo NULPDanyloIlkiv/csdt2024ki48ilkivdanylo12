@@ -80,7 +80,7 @@ void _cClient_::_game_init_(void) {
 
 
         fwprintf(stderr,
-            L"__BYTES_RECV__ : %i | _INIT_ : %d\n", _bytes_recv_, _init_._size_
+            L"__BYTES_RECV__ : %i | _INIT_ : %d %d\n", _bytes_recv_, _init_._size_, _init_._size_
         );
 
         m_nMapW = _init_._size_, m_nMapH = _init_._size_;
