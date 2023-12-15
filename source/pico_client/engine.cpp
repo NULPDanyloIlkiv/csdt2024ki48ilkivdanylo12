@@ -1,6 +1,8 @@
 #include <cassert>
 #include "engine.h"
 
+#include <cmath>
+
 #include <algorithm>
 
 #define _COM_PORT_
@@ -24,10 +26,6 @@ const float _fRADIUS_ = 0.3f;
 static bool _is_point_in_circle_(float x0, float y0, float r0, float px, float py) {
     return ((x0 - px) * (x0 - px) + (y0 - py) * (y0 - py)) < (r0 * r0);
 }
-
-struct _sRGB_{
-    float _r_, _g_, _b_;
-}; typedef _sRGB_ _RGB_;
 
 //! calculate a color (RGB) of a figure by character
 static _RGB_ _type_color_(char _f_) {
@@ -272,15 +270,21 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
      */
 
     if (m_bLMK) {
-        vec2f _vPOINT_ = _DisplayToWorld_(
-            _vMOUSE_.x, _vMOUSE_.y
+        vec3f _p_ = { 0.f };
+
+        _Display_To_World_(
+            m_pMouse, _p_.x, _p_.y, _p_.z
         );
 
-        _vPOINT_.x = clamp(
-            _vPOINT_.x, 0.f, client->_map_w_() - 0.01f
+        vec2f _fCURSOR_ = vec2f { _p_.x, _p_.y };
+
+
+
+        _fCURSOR_.x = clamp(
+            _fCURSOR_.x, 0.f, client->_map_w_() - 0.01f
         );
-        _vPOINT_.y = clamp(
-            _vPOINT_.y, 0.f, client->_map_h_() - 0.01f
+        _fCURSOR_.y = clamp(
+            _fCURSOR_.y, 0.f, client->_map_h_() - 0.01f
         );
 
         for (auto& o: client->_data_()) {
@@ -289,7 +293,7 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
             ) { continue; }
 
             if (
-                _is_point_in_circle_(o.vNewPos.x, o.vNewPos.y, _fRADIUS_, _vPOINT_.x, _vPOINT_.y)
+                _is_point_in_circle_(o.vNewPos.x, o.vNewPos.y, _fRADIUS_, _fCURSOR_.x, _fCURSOR_.y)
             )
             {
                 if (!select) {
@@ -305,7 +309,7 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
         if (
             select != nullptr
         )
-        { select->vNewPos = _vPOINT_; }
+        { select->vNewPos = _fCURSOR_; }
     } else if (select != nullptr) {
 #ifdef _COM_PORT_
         client->_step_make_(
@@ -414,13 +418,13 @@ vec2f _cEngine_::_DisplayToWorld_(
         fDisplayX, fDisplayY
     };
 
-    _fPOINT_ /= vec2f {
-        2.f / client->_map_w_(), 2.f / client->_map_h_()
-    } * vec2f { camera.fScale };
+    auto _s_ = camera.fScale;
+    _fPOINT_.x /= 2.f / client->_map_w_() * _s_;
+    _fPOINT_.y /= 2.f / client->_map_h_() * _s_;
 
-    _fPOINT_ += vec2f {
-        client->_map_w_() * 0.5f, client->_map_h_() * 0.5f
-    } + camera.vOffset;
+    auto _o_ = camera.vOffset;
+    _fPOINT_.x += 0.5f * client->_map_w_() + _o_.x;
+    _fPOINT_.y += 0.5f * client->_map_h_() + _o_.y;
 
     return(_fPOINT_);
 }
@@ -429,11 +433,27 @@ vec2f _cEngine_::_DisplayToWorld_(
 
 //! drawing a OpenGL frame on a window frame
 void _cEngine_::_Draw_Frame_(void) {
+    glEnable(GL_DEPTH_TEST);
+
     glClearColor(
         0.1f, 0.1f, 0.1f, 0.f
     );
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(
+        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+    );
 
+    glMatrixMode(
+        GL_PROJECTION
+    );
+    glLoadIdentity();
+
+    glOrtho(
+        -1.f,+1.f, -1.f,+1.f, -1.f, +16.f
+    );
+
+    glMatrixMode(
+        GL_MODELVIEW
+    );
     glLoadIdentity();
 
 
@@ -445,11 +465,14 @@ void _cEngine_::_Draw_Frame_(void) {
         2.f / client->_map_w_(), 2.f / client->_map_h_(), 1.f
     );
 
-    glTranslatef(
-        -1.f * camera.vOffset.x, -1.f * camera.vOffset.y, 0.f
-    );
+
+
     glTranslatef(
         client->_map_w_() * -0.5f, client->_map_h_() * -0.5f, 0.f
+    );
+
+    glTranslatef(
+        -1.f * camera.vOffset.x, -1.f * camera.vOffset.y, 0.f
     );
 
 
@@ -458,7 +481,7 @@ void _cEngine_::_Draw_Frame_(void) {
     for(size_t x = 0x0; x < client->_map_w_(); x += 0x1) {
         glPushMatrix();
             glTranslatef(
-                x, y, 0.f
+                x, y, -1.f
             );
 
             bool _COL_ = (x + y) % 0x2;
@@ -468,39 +491,61 @@ void _cEngine_::_Draw_Frame_(void) {
     }
     for(size_t y = 0x0; y <= client->_map_h_(); y += 0x1)
     for(size_t x = 0x0; x <= client->_map_w_(); x += 0x1) {
-        glColor3f(
-            1.f, 1.f, 1.f
-        );
+        glPushMatrix();
 
-        glLineWidth(0x3);
-        _Draw_Polygon_(
-            { { x, 0x0 }, { x, client->_map_w_() }, { 0x0, y }, { client->_map_h_(), y } }, GL_LINES
-        );
+            glTranslatef(
+                0.f, 0.f, -0.9f
+            );
+
+            glColor3f(
+                1.f, 1.f, 1.f
+            );
+
+            glLineWidth(0x3);
+            _Draw_Polygon_(
+                { { x, 0x0 }, { x, client->_map_h_() }, { 0x0, y }, { client->_map_w_(), y } }, GL_LINES
+            );
+
+        glPopMatrix();
     }
 
 
+    glPushMatrix();
 
-    vec2f _vMOUSE_ = _MousePos_();
-    vec2f _fCURSOR_ = _DisplayToWorld_(
-        _vMOUSE_.x, _vMOUSE_.y
-    );
+        vec3f _p_ = { 0.f };
+
+        _Display_To_World_(
+            m_pMouse, _p_.x, _p_.y, _p_.z
+        );
+
+        vec2f _fCURSOR_ = vec2f { _p_.x, _p_.y };
+
+    glPopMatrix();
 
     if (
         _fCURSOR_.x >= 0x0 && _fCURSOR_.x < client->_map_w_() && _fCURSOR_.y >= 0x0 && _fCURSOR_.y < client->_map_h_()
     ) {
-        glColor3f(
-            0.9f, 0.9f, 0.1f
-        );
+        glPushMatrix();
 
-        vec2i _iCURSOR_ = (vec2i)_fCURSOR_;
+            glTranslatef(
+                0.f, 0.f, -0.75f
+            );
 
-        glLineWidth(0x3);
-        _Draw_Polygon_(
-            {
-                { _iCURSOR_.x, _iCURSOR_.y }, { _iCURSOR_.x + 0x1, _iCURSOR_.y },
-                { _iCURSOR_.x + 0x1, _iCURSOR_.y + 0x1 }, { _iCURSOR_.x, _iCURSOR_.y + 0x1 }
-            }, GL_LINE_LOOP
-        );
+            glColor3f(
+                0.9f, 0.9f, 0.1f
+            );
+
+            vec2i _iCURSOR_ = (vec2i)_fCURSOR_;
+
+            glLineWidth(0x3);
+            _Draw_Polygon_(
+                {
+                    { _iCURSOR_.x, _iCURSOR_.y }, { _iCURSOR_.x + 0x1, _iCURSOR_.y },
+                    { _iCURSOR_.x + 0x1, _iCURSOR_.y + 0x1 }, { _iCURSOR_.x, _iCURSOR_.y + 0x1 }
+                }, GL_LINE_LOOP
+            );
+
+        glPopMatrix();
     }
 
 
@@ -526,7 +571,7 @@ void _cEngine_::_Draw_Frame_(void) {
         glPushMatrix();
 
             glTranslatef(
-                o.vNewPos.x, o.vNewPos.y, 0.f
+                o.vNewPos.x, o.vNewPos.y, -0.5f
             );
 
             glScalef(
@@ -547,8 +592,11 @@ void _cEngine_::_Draw_Frame_(void) {
                 1.f, 1.f, 1.f
             );
 
-            glLineWidth(0x3);
+            glLineWidth(0x5);
             _Draw_Polygon_(_vert_, GL_LINE_LOOP);
+
+            glPointSize(0x3);
+            _Draw_Polygon_(_vert_, GL_POINTS);
 
         glPopMatrix();
     }
@@ -564,7 +612,7 @@ void _cEngine_::_Draw_Frame_(void) {
         glPushMatrix();
 
             glTranslatef(
-                select->vNewPos.x, select->vNewPos.y, 0.f
+                select->vNewPos.x, select->vNewPos.y, -0.3f
             );
 
             glScalef(
@@ -585,8 +633,11 @@ void _cEngine_::_Draw_Frame_(void) {
                 0.9f, 0.9f, 0.1f
             );
 
-            glLineWidth(0x3);
+            glLineWidth(0x5);
             _Draw_Polygon_(_vert_, GL_LINE_LOOP);
+
+            glPointSize(0x3);
+            _Draw_Polygon_(_vert_, GL_POINTS);
 
         glPopMatrix();
     }
@@ -626,22 +677,5 @@ void _cEngine_::_Draw_Board_(bool _COL_) {
 
         glDisableClientState(GL_COLOR_ARRAY);
 
-    glDisableClientState(GL_VERTEX_ARRAY);
-}
-
-
-
-void _cEngine_::_Draw_Polygon_(
-    const std::vector<vec2f>& _data_, int32_t _mode_
-)
-{
-    glVertexPointer(
-        0x2, GL_FLOAT, 0x0, _data_.data()
-    );
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-        glDrawArrays(
-            _mode_, 0x0, _data_.size()
-        );
     glDisableClientState(GL_VERTEX_ARRAY);
 }

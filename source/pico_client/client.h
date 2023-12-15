@@ -8,6 +8,8 @@
 
 #include <vector>
 
+#include <functional>
+
 /**
  * @file
  *
@@ -31,6 +33,11 @@ struct _sObject_ {
  */
 class _cClient_ {
 
+    //! recv a key and handle a data by callback
+    bool _handle_key_data_(
+        _KEY_ const& _k_, std::function<void()> const& _f_
+    );
+
 public:
 
     /**
@@ -42,11 +49,6 @@ public:
     void _game_init_(void);
 
     //! send a message that stores [key + data] indicating the execution of a player move
-    void _step_(
-        _POINT_& _point_
-    );
-
-    //! implements the start and finish of the execution of a player move
     void _step_make_(
         _KEY_ _key_, _POINT_ _point_
     );
@@ -68,7 +70,7 @@ private:
     _SERIAL_PORT_ m_sp =  { NULL };
 #endif // _COM_PORT_
 
-    int8_t
+    uint8_t
         m_nMapW = 0x5,
         m_nMapH = 0x5;
 

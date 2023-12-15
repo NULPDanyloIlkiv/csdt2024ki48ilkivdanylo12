@@ -59,19 +59,56 @@ _cClient_::~_cClient_(void) {
 
 #ifdef _COM_PORT_
 
-//! send a message that stores [key + data] indicating the initialization of a new game
-void _cClient_::_game_init_(void) {
-    _com_send_key_(&m_sp, _kINIT_);
-
+//! //! recv a key and handle a data by callback
+bool _cClient_::_handle_key_data_(
+    _KEY_ const& _k_, std::function<void()> const& _f_
+)
+{
     size_t _bytes_recv_ = 0x0;
 
     _KEY_ _key_ = _com_recv_key_(&m_sp);
     _bytes_recv_ += sizeof(_key_);
 
-    switch(_key_)
+    fwprintf(stderr,
+        L"__KEY__ : %i.b %i\n", _bytes_recv_, _key_
+    );
+
+    bool _b_ = 0x0;
+
+    if (_key_ == _k_) {
+        if (
+            _f_ != nullptr
+        ) {_f_(); }
+
+        _b_ = true;
+    } else if (_key_ == _kMESSAGE_) {
+        (void)_com_message_(&m_sp); _b_ = false;
+    } else {
+        fwprintf(
+            stderr, L"__ERROR__ - Invalid KEY : %i\n", _key_
+        );
+
+        _com_clear_(&m_sp);
+
+        _b_ = false;
+    }
+
+    return(_b_);
+}
+
+
+
+//! send a message that stores [key + data] indicating the initialization of a new game
+void _cClient_::_game_init_(void) {
+    _com_send_key_(&m_sp, _kINIT_);
+
+
+
+    (void)_handle_key_data_(_kINIT_, [&](void)
     {
-    case(_kINIT_): {
-        _INIT_ _init_ = { 0x0 };
+        _INIT_ _init_ = { 0x0, 0x0 };
+
+        size_t _bytes_recv_ = 0x0;
 
         _bytes_recv_ += _com_recv_(
             &m_sp, &_init_, 0x1, sizeof(_init_)
@@ -80,10 +117,10 @@ void _cClient_::_game_init_(void) {
 
 
         fwprintf(stderr,
-            L"__BYTES_RECV__ : %i | _INIT_ : %d %d\n", _bytes_recv_, _init_._size_, _init_._size_
+            L"__BYTES_RECV__ : %i.b | _INIT_ : %d %d\n", _bytes_recv_, _init_._size_w_, _init_._size_h_
         );
 
-        m_nMapW = _init_._size_, m_nMapH = _init_._size_;
+        m_nMapW = _init_._size_w_, m_nMapH = _init_._size_h_;
 
         fwprintf(stderr,
             L"__BOARD__ : %d x %d\n", m_nMapW, m_nMapH
@@ -91,12 +128,8 @@ void _cClient_::_game_init_(void) {
 
 
 
-        _key_ = _com_recv_key_(&m_sp);
-        _bytes_recv_ += sizeof(_key_);
-
-        switch(_key_)
+        (void)_handle_key_data_(_kINIT_, [&](void)
         {
-        case(_kINIT_): {
             if (
                 !m_vecObjects.empty()
             ) { m_vecObjects.clear(); }
@@ -128,84 +161,23 @@ void _cClient_::_game_init_(void) {
                         m_vecObjects.
                             push_back(o);
                     }
-                }
 
-                fwprintf(stderr,
-                    L"%s\n", _board_
-                );
+                    fwprintf(stderr,
+                        L"%c%c", _board_[i], i != m_nMapW - 0x1 ? '\0' : '\n'
+                    );
+                }
 
                 delete[] _board_;
             }
-        } break;
-
-        case(_kMESSAGE_): {
-            (void)_com_message_(&m_sp);
-        } break;
-
-        default: {
-            fwprintf(
-                stderr, L"__ERROR__ - Invalid KEY : %i\n", _key_
-            );
-
-            _com_clear_(&m_sp);
-        } break;
-
         }
-
-    } break;
-
-
-
-    default: {
-        fwprintf(
-            stderr, L"__ERROR__ - Invalid KEY : %i\n", _key_
         );
-
-        _com_clear_(&m_sp);
-    } break;
-
     }
+    );
 }
 
 
 
 //! send a message that stores [key + data] indicating the execution of a player move
-void _cClient_::_step_(_POINT_& _point_) {
-    size_t _bytes_recv_ = 0x0;
-
-    _KEY_ _key_ = _com_recv_key_(&m_sp);
-    _bytes_recv_ += sizeof(_key_);
-
-    switch(_key_)
-    {
-    case(_kSTEP_MAKE_OLD_): case(_kSTEP_MAKE_NEW_): {
-        _bytes_recv_ += _com_recv_(
-            &m_sp, &_point_, 0x1, sizeof(_point_)
-        );
-
-        fwprintf(stderr, L"__BYTES_RECV__ : %i %s : %i %i\n",
-            _bytes_recv_, _key_ == _kSTEP_MAKE_OLD_ ? "OLD" : "NEW", _point_.x, _point_.y
-        );
-    } break;
-
-    case(_kMESSAGE_): {
-        (void)_com_message_(&m_sp);
-    } break;
-
-    default: {
-        fwprintf(
-            stderr, L"__ERROR__ - Invalid KEY : %i\n", _key_
-        );
-
-        _com_clear_(&m_sp);
-    } break;
-
-    }
-}
-
-
-
-//! implements the start and finish of the execution of a player move
 void _cClient_::_step_make_(
     _KEY_ _key_, _POINT_ _point_
 )
@@ -216,11 +188,25 @@ void _cClient_::_step_make_(
         _key_, &_point_, 0x1, sizeof(_point_)
     );
 
-    fwprintf(stderr, L"__BYTES_SEND__ : %i NEW : %i %i\n",
+    fwprintf(stderr, L"__BYTES_SEND__ : %i.b NEW : %i %i\n",
         _bytes_send_, _point_.x, _point_.y
     );
 
-    _step_(_point_);
+
+
+    (void)_handle_key_data_(_key_, [&](void)
+        {
+            size_t _bytes_recv_ = 0x0;
+
+            _bytes_recv_ += _com_recv_(
+                &m_sp, &_point_, 0x1, sizeof(_point_)
+            );
+
+            fwprintf(stderr, L"__BYTES_RECV__ : %i.b %s : %i %i\n",
+                _bytes_recv_, _key_ == _kSTEP_MAKE_OLD_ ? "OLD" : "NEW", _point_.x, _point_.y
+            );
+        }
+    );
 }
 
 
@@ -236,23 +222,21 @@ void _cClient_::_step_bot_(void) {
 void _cClient_::_step_take_(void) {
     _com_send_key_(&m_sp, _kSTEP_TAKE_);
 
-    size_t _bytes_recv_ = 0x0;
 
-    _KEY_ _key_ = _com_recv_key_(&m_sp);
-    _bytes_recv_ += sizeof(_key_);
 
-    switch(_key_)
+    (void)_handle_key_data_(_kSTEP_TAKE_, [&](void)
     {
-    case(_kSTEP_TAKE_): {
         _STEP_ _s_ = {
             { 0x0 }, { 0x0 }
         };
+
+        size_t _bytes_recv_ = 0x0;
 
         _bytes_recv_ += _com_recv_(
             &m_sp, &_s_, 0x1, sizeof(_s_)
         );
 
-        fwprintf(stderr, L"__BYTES_RECV__ : %i | OLD | NEW : %d %d -> %d %d\n",
+        fwprintf(stderr, L"__BYTES_RECV__ : %i.b | OLD | NEW : %d %d -> %d %d\n",
             _bytes_recv_, _s_._old_.x, _s_._old_.y, _s_._new_.x, _s_._new_.y
         );
 
@@ -268,12 +252,8 @@ void _cClient_::_step_take_(void) {
 
 
 
-        _key_ = _com_recv_key_(&m_sp);
-        _bytes_recv_ += sizeof(_key_);
-
-        switch(_key_)
+        (void)_handle_key_data_(_kUPDATE_, [&](void)
         {
-        case(_kUPDATE_): {
             size_t _cnt_ = 0x0;
 
             _bytes_recv_ += _com_recv_(
@@ -306,7 +286,7 @@ void _cClient_::_step_take_(void) {
                             ) {
                                 return(_o_);
                             } else {
-                                fwprintf(stderr, L"__BYTES_RECV__ : %i UPDATE : %c %i %i\n",
+                                fwprintf(stderr, L"__BYTES_RECV__ : %i.b UPDATE : %c %i %i\n",
                                     _bytes_recv_, _o_.cType, int(_o_.vNewPos.x), int(_o_.vNewPos.y)
                                 );
                             }
@@ -318,36 +298,10 @@ void _cClient_::_step_take_(void) {
                     }
                 );
             }
-        } break;
-
-        case(_kMESSAGE_): {
-            (void)_com_message_(&m_sp);
-        } break;
-
-        default: {
-            fwprintf(
-                stderr, L"__ERROR__ - Invalid KEY : %i\n", _key_
-            );
-
-            _com_clear_(&m_sp);
-        } break;
-
         }
-    } break;
-
-    case(_kMESSAGE_): {
-        (void)_com_message_(&m_sp);
-    } break;
-
-    default: {
-        fwprintf(
-            stderr, L"__ERROR__ - Invalid KEY : %i\n", _key_
         );
-
-        _com_clear_(&m_sp);
-    } break;
-
     }
+    );
 }
 
 #endif _COM_PORT_

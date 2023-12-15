@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @brief vec2.cpp
+ * @brief vec_mat.cpp
  */
 
 vec2i::vec2i(void) : x(0x0), y(0x0) { /*Code...*/ }

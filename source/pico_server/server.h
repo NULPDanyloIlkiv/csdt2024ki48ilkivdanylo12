@@ -45,6 +45,6 @@ typedef uint8_t _KEY_;
 
 bool _server_update_(_KEY_ _key_);
 
-void _server_loop_(void);
+bool _server_loop_(void);
 
 #endif // _SERVER_H_

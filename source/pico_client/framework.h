@@ -50,8 +50,8 @@
 #endif
 #include "helper.h"
 
-#include "vec2.h"
-#include "vecfunctions.h"
+#include "vec_mat.h"
+#include "vec_mat_functions.h"
 // Точка входа "Trivial"
 #ifndef TMain
 #define TMain APIENTRY WinMain

@@ -9,7 +9,7 @@ project(pico_project)
 pico_sdk_init()
 
 add_executable(main
-	main.c server.c serial_port.c
+	main.c server.c logic.c update.c serial_port.c
 )
 
 

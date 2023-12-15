@@ -37,8 +37,11 @@ int main() {
     );
 
 
-    //! main loop
-    _server_loop_();
+
+    //! server loop
+    while(
+        _server_loop_()
+    ) { /*Code...*/ }
 
 
 

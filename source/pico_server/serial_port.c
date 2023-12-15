@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @brief serial_port.h
+ * @brief serial_port.c
  *
  * this file stores the implementation of functions for server operations
  */
@@ -79,8 +79,6 @@ size_t _com_send_(
 }
 
 
-
-#include "data.h"
 
 //! reading the key used to identify the data
 _KEY_ _com_recv_key_(void) {

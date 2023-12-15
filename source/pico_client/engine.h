@@ -54,10 +54,6 @@ class _cEngine_ :
 
     void _Draw_Board_(bool _COL_);
 
-	void _Draw_Polygon_(
-        const std::vector<vec2f>& _data_, int32_t _mode_
-    );
-
 
 
     /**

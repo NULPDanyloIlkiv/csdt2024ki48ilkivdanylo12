@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * @brief vec2.h
+ * @brief vec_mat.h
  */
 
 struct vec2i; struct vec2f;
@@ -72,4 +72,12 @@ struct vec2f {
 
 	bool operator==(vec2f const& vec);
 	bool operator!=(vec2f const& vec);
+};
+
+
+
+struct vec3f;
+
+struct vec3f {
+    float x, y, z;
 };

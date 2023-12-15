@@ -24,7 +24,7 @@ typedef uint8_t _KEY_;
 
 //! a structure that stores a data need to initialize the game
 struct _sInit_ {
-    uint8_t _size_;
+    uint8_t _size_w_, _size_h_;
 }; typedef _sInit_ _INIT_;
 
 //! a structure that stores a point with [x y] coordinates
