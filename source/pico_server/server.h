@@ -39,11 +39,14 @@ bool _server_step_take_(void);
 //! ping the connection with a client
 bool _server_ping_(void);
 
-
+//! restart the connection with a client
+bool _server_restart_(void);
 
 typedef uint8_t _KEY_;
 
-bool _server_update_(_KEY_ _key_);
+bool _server_update_(
+    _KEY_ _key_
+);
 
 bool _server_loop_(void);
 

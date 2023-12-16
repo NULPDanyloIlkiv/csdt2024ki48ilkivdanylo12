@@ -13,14 +13,14 @@
  * this file stores the implementation of the client class that implements the client
  */
 
-int8_t _cClient_::_map_w_(void) const
+uint8_t _cClient_::_map_w_(void) const
 { return(m_nMapW); }
-int8_t _cClient_::_map_h_(void) const
+uint8_t _cClient_::_map_h_(void) const
 { return(m_nMapH); }
 
 std::vector<
     _sObject_
->& _cClient_::_data_(void) {
+> _cClient_::_data_(void) {
     return(m_vecObjects);
 }
 
@@ -45,8 +45,6 @@ _cClient_::_cClient_(
     _com_mask_(
         &m_sp, EV_RXCHAR
     );
-
-    _game_init_();
 #endif // _COM_PORT_
 }
 
@@ -100,7 +98,9 @@ bool _cClient_::_handle_key_data_(
 
 //! send a message that stores [key + data] indicating the initialization of a new game
 void _cClient_::_game_init_(void) {
-    _com_send_key_(&m_sp, _kINIT_);
+    _com_send_key_(
+        &m_sp, _kINIT_
+    );
 
 
 
@@ -220,7 +220,9 @@ void _cClient_::_step_bot_(void) {
 
 //! recv a message that stores a [key + data] indicating a result of a player / bot move | update a map and objects
 void _cClient_::_step_take_(void) {
-    _com_send_key_(&m_sp, _kSTEP_TAKE_);
+    _com_send_key_(
+        &m_sp, _kSTEP_TAKE_
+    );
 
 
 
@@ -302,6 +304,18 @@ void _cClient_::_step_take_(void) {
         );
     }
     );
+}
+
+void _cClient_::_game_restart_(void) {
+    _com_send_key_(
+        &m_sp, _kRESTART_
+    );
+
+    (void)_handle_key_data_(_kRESTART_, [this](void)
+        { fwprintf(stderr, L"__RESTART__\n"); }
+    );
+
+    _game_init_();
 }
 
 #endif _COM_PORT_

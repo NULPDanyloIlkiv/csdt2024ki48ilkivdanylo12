@@ -2,7 +2,9 @@
 
 #include "serial_port.h"
 
+#include "game.h"
 #include "logic.h"
+
 #include "update.h"
 
 /**
@@ -11,64 +13,18 @@
  * @brief server.c
  */
 
-static _MASK_MOVE_ _mask_move_ = { 0x0, 0x0, NULL };
-static _MASK_JUMP_ _mask_jump_ = { 0x0, 0x0, NULL };
-
 //! allocate memory and initialize attributes
 bool _server_create_(void) {
-    bool _b_ = 0x0;
-
-    if (
-        _game_create_()
-    )
-    {
-        _POINT_ _point_ = {
-            _get_board_w_(), _get_board_h_()
-        };
-
-        _mask_move_._w_ = _point_.x;
-        _mask_move_._h_ = _point_.y;
-
-        _mask_move_ = _logic_create_mask_move_(
-            _mask_move_
-        );
-
-        _mask_jump_._w_ = _point_.x;
-        _mask_jump_._h_ = _point_.y;
-
-        _mask_jump_ = _logic_create_mask_jump_(
-            _mask_jump_
-        );
-
-        _b_ = true;
-    } else {
-        _b_ = false;
-    }
-
-    return(_b_);
+    return(
+        _logic_create_()
+    );
 }
 
 //! free allocated memory
 bool _server_destroy_(void) {
-    bool _b_ = 0x0;
-
-    if (
-        _game_destroy_()
-    )
-    {
-        _mask_move_ = _logic_destroy_mask_move_(
-            _mask_move_
-        );
-        _mask_jump_ = _logic_destroy_mask_jump_(
-            _mask_jump_
-        );
-
-        _b_ = true;
-    } else {
-        _b_ = false;
-    }
-
-    return(_b_);
+    return(
+        _logic_destroy_()
+    );
 }
 
 
@@ -97,7 +53,7 @@ bool _server_init_(void)
         _b_ = true;
     } else {
         (void)_com_send_message_(
-            "ERROR - Failed to send _game_._board_data_"
+            "ERROR - Failed to init _game_"
         );
 
         _b_ = false;
@@ -109,8 +65,8 @@ bool _server_init_(void)
 
 
 static _POINT_
-    _old_ = { 0x0 },
-    _new_ = { 0x0 };
+    _old_ = {},
+    _new_ = {};
 
 //! player select a checker -  save it -> _old_
 bool _server_step_make_old_(void) {
@@ -123,7 +79,7 @@ bool _server_step_make_old_(void) {
     )
     {
         (void)_com_send_message_(
-            "ERROR - Invalid DATA"
+            "ERROR - Invalid _data_"
         ); return(false);
     }
 
@@ -145,7 +101,7 @@ bool _server_step_make_new_(void) {
     )
     {
         (void)_com_send_message_(
-            "ERROR - Invalid DATA"
+            "ERROR - Invalid _data_"
         ); return(false);
     }
 
@@ -161,74 +117,25 @@ bool _server_step_bot_(void) {
     return(true);
 }
 
+
+
 //! make a move and check the result of a move
 bool _server_step_take_(void) {
+    _STEP_ _step_ = {};
+
     if (
-        _mask_move_._data_ != NULL && _mask_jump_._data_ != NULL
-    )
-    {
-        _logic_clear_mask_move_(_mask_move_);
-        _mask_move_ = _logic_find_move_(
-            _mask_move_, _old_
-        );
-
-        _logic_clear_mask_jump_(_mask_jump_);
-        _mask_jump_ = _logic_find_jump_(
-            _mask_jump_, _old_
-        );
-
-        if (
-            _mask_jump_._data_[_new_.x][_new_.y] != NULL
-        ) {
-            _POINT_* _jump_ = _mask_jump_._data_
-                [_new_.x][_new_.y];
-
-            _POINT_ _j_ = *(_jump_);
-
-
-
-            _set_board_char_(
-                _j_.x, _j_.y, '.'
-            );
-
-            (void)_update_add_(_j_, '.');
-
-
-
-            _board_swap_(
-                (_STEP_){ _old_, _new_ }
-            );
-        } else if (
-            _mask_move_._data_[_new_.x][_new_.y] != NULL
-        ) {
-            _board_swap_(
-                (_STEP_){ _old_, _new_ }
-            );
-        } else {
-            _new_ = _old_;
-        }
+        _logic_step_(_old_, _new_, &_step_)
+    ) {
+        /*Code...*/
     } else {
         (void)_com_send_message_(
-            "ERROR - Failed to send _update_._board_data_"
+            "ERROR - Failed to make _step_"
         ); return(false);
     }
-
-    if (
-        _q_or_k_(_new_)
-    )
-    {
-        (void)_update_add_(
-            _new_, _get_board_char_(_new_.x, _new_.y)
-        );
-    }
-
-    _STEP_ _step_ = { _old_, _new_ };
 
     (void)_com_send_data_(
         _kSTEP_TAKE_, &_step_, 0x1, sizeof(_step_)
     );
-
-
 
     if (
         !_update_send_()
@@ -260,9 +167,22 @@ bool _server_ping_(void) {
     ); return(true);
 }
 
+//! restart the connection with a client
+bool _server_restart_(void) {
+    _KEY_ _key_ = _kRESTART_;
+
+    (void)_com_send_(
+        &_key_, 0x1, sizeof(_key_)
+    );
+
+    bool _b_ = 0x0;
+
+    return(_b_);
+}
 
 
-static bool _active_ = true;
+
+static bool _active_ = 0x0;
 
 bool _server_update_(_KEY_ _key_)
 {
@@ -272,7 +192,7 @@ bool _server_update_(_KEY_ _key_)
     {
 
     case(_kRESTART_): {
-        _state_ = 0x0;
+        _state_ = _server_restart_();
     } break;
 
 
@@ -324,11 +244,15 @@ bool _server_loop_(void) {
 
     _active_ &= _server_create_();
 
+
+
     _KEY_ _key_ = _kERROR_;
 
     while(
         _key_ = _com_recv_key_(), _server_update_(_key_)
     ) { /*Code... */ }
+
+
 
     _active_ &= _server_destroy_();
 

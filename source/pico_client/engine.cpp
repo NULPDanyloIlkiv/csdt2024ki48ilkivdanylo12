@@ -60,9 +60,15 @@ _cEngine_::_cEngine_(const _In_ HINSTANCE& hInst,
 {
     m_bAppActive = 0x1;
 
+    //! create a client handle
     client = std::make_unique<
         _cClient_
     >(_PORT_ID_);
+
+    //! init the game
+    client->_game_init_();
+
+    _update_ = true;
 }
 
 //! the engine class destructor
@@ -191,7 +197,7 @@ LRESULT _cEngine_::HandleMessage(UINT _In_ uMsg,
 
     //! drawing a OpenGL frame on a window frame
     case WM_PAINT: {
-        _Draw_Frame_();
+        _DrawFrame_();
     } break;
 
 
@@ -235,7 +241,26 @@ LRESULT _cEngine_::HandleMessage(UINT _In_ uMsg,
         m_nWheelDelta = _nDelta;
     } break;
 
+    case WM_KEYUP: {
+        size_t _nKey = size_t(wParam);
 
+        switch(_nKey)
+        {
+        case(VK_SPACE): {
+            if (select) {
+                select = nullptr;
+            }
+
+            client->_game_restart_();
+
+            _update_ = true;
+
+        } break;
+
+        default:
+            break;
+        }
+    } break;
 
     default:
         break;
@@ -248,6 +273,14 @@ LRESULT _cEngine_::HandleMessage(UINT _In_ uMsg,
 
 //! body of a main loop
 bool _cEngine_::_DoWork_(float fElapsedTime) {
+    if (_update_) {
+        if (
+            !_UpdateData_()
+        ) { /*Code...*/ }
+
+        _update_ = 0x0;
+    }
+
     //! mouse position in the range: -1.f -> +1.f
     vec2f _vMOUSE_ = _MousePos_();
 
@@ -281,13 +314,15 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
 
 
         _fCURSOR_.x = clamp(
-            _fCURSOR_.x, 0.f, client->_map_w_() - 0.01f
+            _fCURSOR_.x, 0.f, _data_.m_nMapW - 0.01f
         );
         _fCURSOR_.y = clamp(
-            _fCURSOR_.y, 0.f, client->_map_h_() - 0.01f
+            _fCURSOR_.y, 0.f, _data_.m_nMapH - 0.01f
         );
 
-        for (auto& o: client->_data_()) {
+        size_t _size_ = _data_.m_vecData.size();
+
+        for (auto& o: _data_.m_vecData) {
             if (
                 !(o.cType != '.')
             ) { continue; }
@@ -317,6 +352,8 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
         );
 
         client->_step_take_();
+
+        _update_ = true;
 #endif // _COM_PORT_
         select = nullptr;
     }
@@ -378,16 +415,27 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
 
     //! clamp camera movement
     camera.vOffset.x = clamp(
-        camera.vOffset.x, -0x1 * (int)client->_map_w_(), client->_map_w_()
+        camera.vOffset.x, -0x1 * (int)_data_.m_nMapW, _data_.m_nMapW
     );
     camera.vOffset.y = clamp(
-        camera.vOffset.y, -0x1 * (int)client->_map_h_(), client->_map_h_()
+        camera.vOffset.y, -0x1 * (int)_data_.m_nMapH, _data_.m_nMapH
     );
 
     //! update a window
     (void)InvalidateRect(
         m_hWnd, NULL, NULL
     );
+
+    return(0x1);
+}
+
+
+
+//! update a data to current one
+bool _cEngine_::_UpdateData_(void) {
+    _data_ = {
+        client->_map_w_(), client->_map_h_(), client->_data_()
+    };
 
     return(0x1);
 }
@@ -419,12 +467,12 @@ vec2f _cEngine_::_DisplayToWorld_(
     };
 
     auto _s_ = camera.fScale;
-    _fPOINT_.x /= 2.f / client->_map_w_() * _s_;
-    _fPOINT_.y /= 2.f / client->_map_h_() * _s_;
+    _fPOINT_.x /= 2.f / _data_.m_nMapW * _s_;
+    _fPOINT_.y /= 2.f / _data_.m_nMapH * _s_;
 
     auto _o_ = camera.vOffset;
-    _fPOINT_.x += 0.5f * client->_map_w_() + _o_.x;
-    _fPOINT_.y += 0.5f * client->_map_h_() + _o_.y;
+    _fPOINT_.x += 0.5f * _data_.m_nMapW + _o_.x;
+    _fPOINT_.y += 0.5f * _data_.m_nMapH + _o_.y;
 
     return(_fPOINT_);
 }
@@ -432,7 +480,7 @@ vec2f _cEngine_::_DisplayToWorld_(
 
 
 //! drawing a OpenGL frame on a window frame
-void _cEngine_::_Draw_Frame_(void) {
+void _cEngine_::_DrawFrame_(void) {
     glEnable(GL_DEPTH_TEST);
 
     glClearColor(
@@ -462,13 +510,13 @@ void _cEngine_::_Draw_Frame_(void) {
         camera.fScale, camera.fScale, 1.f
     );
     glScalef(
-        2.f / client->_map_w_(), 2.f / client->_map_h_(), 1.f
+        2.f / _data_.m_nMapW, 2.f / _data_.m_nMapH, 1.f
     );
 
 
 
     glTranslatef(
-        client->_map_w_() * -0.5f, client->_map_h_() * -0.5f, 0.f
+        _data_.m_nMapW * -0.5f, _data_.m_nMapH * -0.5f, 0.f
     );
 
     glTranslatef(
@@ -477,8 +525,8 @@ void _cEngine_::_Draw_Frame_(void) {
 
 
 
-    for(size_t y = 0x0; y < client->_map_h_(); y += 0x1)
-    for(size_t x = 0x0; x < client->_map_w_(); x += 0x1) {
+    for(size_t y = 0x0; y < _data_.m_nMapH; y += 0x1)
+    for(size_t x = 0x0; x < _data_.m_nMapW; x += 0x1) {
         glPushMatrix();
             glTranslatef(
                 x, y, -1.f
@@ -486,11 +534,11 @@ void _cEngine_::_Draw_Frame_(void) {
 
             bool _COL_ = (x + y) % 0x2;
 
-            _Draw_Board_(_COL_);
+            _DrawBoard_(_COL_);
         glPopMatrix();
     }
-    for(size_t y = 0x0; y <= client->_map_h_(); y += 0x1)
-    for(size_t x = 0x0; x <= client->_map_w_(); x += 0x1) {
+    for(size_t y = 0x0; y <= _data_.m_nMapH; y += 0x1)
+    for(size_t x = 0x0; x <= _data_.m_nMapW; x += 0x1) {
         glPushMatrix();
 
             glTranslatef(
@@ -503,7 +551,7 @@ void _cEngine_::_Draw_Frame_(void) {
 
             glLineWidth(0x3);
             _Draw_Polygon_(
-                { { x, 0x0 }, { x, client->_map_h_() }, { 0x0, y }, { client->_map_w_(), y } }, GL_LINES
+                { { x, 0x0 }, { x, _data_.m_nMapH }, { 0x0, y }, { _data_.m_nMapW, y } }, GL_LINES
             );
 
         glPopMatrix();
@@ -523,7 +571,7 @@ void _cEngine_::_Draw_Frame_(void) {
     glPopMatrix();
 
     if (
-        _fCURSOR_.x >= 0x0 && _fCURSOR_.x < client->_map_w_() && _fCURSOR_.y >= 0x0 && _fCURSOR_.y < client->_map_h_()
+        _fCURSOR_.x >= 0x0 && _fCURSOR_.x < _data_.m_nMapW && _fCURSOR_.y >= 0x0 && _fCURSOR_.y < _data_.m_nMapH
     ) {
         glPushMatrix();
 
@@ -558,7 +606,7 @@ void _cEngine_::_Draw_Frame_(void) {
             sinf(i * (6.28f / 0x5)), cosf(i * (6.28f / 0x5))
         };
 
-    for (auto& o : client->_data_()) {
+    for (auto& o : _data_.m_vecData) {
         if (
             !(o.cType != '.')
         ) { continue; }
@@ -647,7 +695,7 @@ void _cEngine_::_Draw_Frame_(void) {
 
 
 
-void _cEngine_::_Draw_Board_(bool _COL_) {
+void _cEngine_::_DrawBoard_(bool _COL_) {
     vec2f _vert_[] = {
         { 0.f, 0.f }, { 0.f, 1.f }, { 1.f, 1.f }, { 1.f, 0.f }
     };

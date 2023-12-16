@@ -15,7 +15,7 @@
 enum _eKey_ {
     _kERROR_ = 0x0, _kINIT_ = 0x1, _kSTEP_MAKE_OLD_ = 0x2, _kSTEP_MAKE_NEW_ = 0x3, _kSTEP_BOT_ = 0x4, _kSTEP_TAKE_ = 0x5, _kUPDATE_ = 0xA,
 
-    _kMESSAGE_ = 0xF
+    _kMESSAGE_ = 0xF, _kRESTART_ = 0xFF
 };
 
 typedef uint8_t _KEY_;

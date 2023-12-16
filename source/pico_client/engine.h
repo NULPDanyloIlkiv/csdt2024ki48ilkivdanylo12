@@ -35,6 +35,9 @@ class _cEngine_ :
     //! body of a main loop
 	bool _DoWork_(float fElapsedTime);
 
+	//! update a data to current one
+    bool _UpdateData_(void);
+
 
     //! transformations of a point in space
     /**
@@ -50,9 +53,9 @@ class _cEngine_ :
 
 
     //! drawing a OpenGL frame on a window frame
-    void _Draw_Frame_(void);
+    void _DrawFrame_(void);
 
-    void _Draw_Board_(bool _COL_);
+    void _DrawBoard_(bool _COL_);
 
 
 
@@ -60,14 +63,24 @@ class _cEngine_ :
      * class attributes
      */
 
+    bool m_bAppActive = 0x0;
+
+
+
     //! client handle
     std::unique_ptr<
         _cClient_
     > client = nullptr;
 
+    bool _update_ = 0x0;
 
+    struct {
+        uint8_t m_nMapW = 0x0, m_nMapH = 0x0;
+        std::vector<_sObject_> m_vecData;
+    } _data_;
 
-    bool m_bAppActive = 0x0;
+    //! a pointer to a object we're working with
+    _sObject_* select = nullptr;
 
 
 
@@ -89,11 +102,6 @@ class _cEngine_ :
     POINT m_pMouse = { 0x0 };
     bool m_bLMK = 0x0, m_bRMK = 0x0;
     int16_t m_nWheelDelta = 0x0;
-
-
-
-    //! pointer to the object we are working with
-    _sObject_* select = nullptr;
 
 
 

@@ -58,6 +58,8 @@ public:
 
     //! recv a message that stores a [key + data] indicating a result of a player / bot move | update a map and objects
     void _step_take_(void);
+
+    void _game_restart_(void);
 #endif // _COM_PORT_
 
 private:
@@ -87,12 +89,12 @@ public:
         const wchar_t* wcPortID
     ); ~_cClient_(void);
 
-    int8_t _map_w_(void) const;
-    int8_t _map_h_(void) const;
+    uint8_t _map_w_(void) const;
+    uint8_t _map_h_(void) const;
 
     std::vector<
         _sObject_
-    >& _data_(void);
+    > _data_(void);
 };
 
 #endif // _CLIENT_H_
