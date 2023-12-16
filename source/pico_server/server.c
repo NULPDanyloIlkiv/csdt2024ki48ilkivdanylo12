@@ -53,7 +53,7 @@ bool _server_init_(void)
         _b_ = true;
     } else {
         (void)_com_send_message_(
-            "ERROR - Failed to init _game_"
+            "__ERROR__ - Failed to init _game_"
         );
 
         _b_ = false;
@@ -79,8 +79,8 @@ bool _server_step_make_old_(void) {
     )
     {
         (void)_com_send_message_(
-            "ERROR - Invalid _data_"
-        ); return(false);
+            "__ERROR__ - Invalid _data_"
+        ); return(0x0);
     }
 
     (void)_com_send_data_(
@@ -101,8 +101,8 @@ bool _server_step_make_new_(void) {
     )
     {
         (void)_com_send_message_(
-            "ERROR - Invalid _data_"
-        ); return(false);
+            "__ERROR__ - Invalid _data_"
+        ); return(0x0);
     }
 
     (void)_com_send_data_(
@@ -129,8 +129,8 @@ bool _server_step_take_(void) {
         /*Code...*/
     } else {
         (void)_com_send_message_(
-            "ERROR - Failed to make _step_"
-        ); return(false);
+            "__ERROR__ - Failed to make _step_"
+        ); return(0x0);
     }
 
     (void)_com_send_data_(
@@ -141,8 +141,8 @@ bool _server_step_take_(void) {
         !_update_send_()
     ) {
         (void)_com_send_message_(
-            "ERROR - Failed to send _update_"
-        ); return(false);
+            "__ERROR__ - Failed to send _update_"
+        ); return(0x0);
     }
 
     (void)_update_clear_();

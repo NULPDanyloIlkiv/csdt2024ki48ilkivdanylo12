@@ -10,6 +10,39 @@
  * @brief logic.c
  */
 
+static void* _logic_all_(
+    void* _data_, _POINT_ _id_, char _c_, int8_t _set_, void* (_f_)(void*, _POINT_, char, _POINT_, int8_t, int8_t)
+) {
+    if (_set_ != 0x0) {
+        for (int8_t x = -0x1; x < 0x2; x += 0x2) {
+            int8_t y = _set_;
+
+            _POINT_ _p_ = {
+                _id_.x + x, _id_.y + y
+            };
+
+            _data_ = _f_(
+                _data_, _id_, _c_, _p_, x, y
+            );
+        }
+    } else {
+        for (int8_t y = -0x1; y < 0x2; y += 0x2)
+        for (int8_t x = -0x1; x < 0x2; x += 0x2) {
+            _POINT_ _p_ = {
+                _id_.x + x, _id_.y + y
+            };
+
+            _data_ = _f_(
+                _data_, _id_, _c_, _p_, x, y
+            );
+        }
+    }
+
+    return(_data_);
+}
+
+
+
 _MASK_MOVE_ _logic_create_mask_move_(
     _MASK_MOVE_ _data_
 )
@@ -76,6 +109,26 @@ _MASK_MOVE_ _logic_destroy_mask_move_(
 
 
 
+static void* _logic_move_(
+    void* _data_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
+) {
+    _MASK_MOVE_* _mask_move_ = (_MASK_MOVE_*)_data_;
+
+    if (
+        _is_inside_board_(_p_.x, _p_.y)
+    ) {
+        _mask_move_->_data_[_p_.x][_p_.y] = _logic_is_move_one_(
+            _id_, _c_, _p_
+        );
+
+        _mask_move_->_cnt_ += 0x1;
+    }
+
+    return(_data_);
+}
+
+
+
 bool _logic_is_move_one_(
     _POINT_ _id_, char _c_, _POINT_ _p_
 ) {
@@ -91,44 +144,15 @@ bool _logic_is_move_one_(
     }
 }
 
-_MASK_MOVE_ _logic_find_move_(
+_MASK_MOVE_ _logic_find_move_all_(
     _MASK_MOVE_ _data_, _POINT_ _id_, char _c_
 )
 {
-    int8_t _set_ = (_c_ == 'W') ? 0x1 : _c_ == 'B' ? -0x1 : 0x0;
+    int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
 
-    if (_set_ != 0x0) {
-        for (int8_t x = -0x1; x < 0x2; x += 0x2) {
-            int8_t y = _set_;
-
-            _POINT_ _p_ = {
-                _id_.x + x, _id_.y + y
-            };
-
-            if (
-                _is_inside_board_(_p_.x, _p_.y)
-            ) {
-                _data_._data_[_p_.x][_p_.y] = _logic_is_move_one_(_id_, _c_, _p_);
-
-                _data_._cnt_ += 0x1;
-            }
-        }
-    } else {
-        for (int8_t y = -0x1; y < 0x2; y += 0x2)
-        for (int8_t x = -0x1; x < 0x2; x += 0x2) {
-            _POINT_ _p_ = {
-                _id_.x + x, _id_.y + y
-            };
-
-            if (
-                _is_inside_board_(_p_.x, _p_.y)
-            ) {
-                _data_._data_[_p_.x][_p_.y] = _logic_is_move_one_(_id_, _c_, _p_);
-
-                _data_._cnt_ += 0x1;
-            }
-        }
-    }
+    (void)_logic_all_(
+        &_data_, _id_, _c_, _set_, &_logic_move_
+    );
 
     return(_data_);
 }
@@ -199,6 +223,29 @@ _MASK_JUMP_ _logic_destroy_mask_jump_(
 
 
 
+static void* _logic_jump_(
+    void* _data_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
+) {
+    _MASK_JUMP_* _mask_jump_ = (_MASK_JUMP_*)_data_;
+
+    if (
+        _logic_is_jump_one_(_id_, _c_, _p_)
+    ) {
+        _mask_jump_->_data_[_p_.x + x][_p_.y + y] = malloc(
+            sizeof(_POINT_)
+        );
+
+        *_mask_jump_->_data_
+            [_p_.x + x][_p_.y + y] = _p_;
+
+        _mask_jump_->_cnt_ += 0x1;
+    }
+
+    return(_data_);
+}
+
+
+
 bool _logic_is_jump_one_(
     _POINT_ _id_, char _c_, _POINT_ _p_
 ) {
@@ -232,56 +279,53 @@ bool _logic_is_jump_one_(
     }
 }
 
-_MASK_JUMP_ _logic_find_jump_(
+_MASK_JUMP_ _logic_find_jump_all_(
     _MASK_JUMP_ _data_, _POINT_ _id_, char _c_
 )
 {
-    int8_t _set_ = (_c_ == 'W') ? 0x1 : _c_ == 'B' ? -0x1 : '\0';
+    int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
 
-    if (_set_ != 0x0) {
-        for (int8_t x = -0x1; x < 0x2; x += 0x2) {
-            int8_t y = _set_;
-
-            _POINT_ _p_ = {
-                _id_.x + x, _id_.y + y
-            };
-
-            if (
-                _logic_is_jump_one_(_id_, _c_, _p_)
-            ) {
-                _data_._data_[_p_.x + x][_p_.y + y] = malloc(
-                    sizeof(_POINT_)
-                );
-
-                *_data_._data_
-                    [_p_.x + x][_p_.y + y] = _p_;
-
-                _data_._cnt_ += 0x1;
-            }
-        }
-    } else {
-        for (int8_t y = -0x1; y < 0x2; y += 0x2)
-        for (int8_t x = -0x1; x < 0x2; x += 0x2) {
-            _POINT_ _p_ = {
-                _id_.x + x, _id_.y + y
-            };
-
-            if (
-                _logic_is_jump_one_(_id_, _c_, _p_)
-            ) {
-                _data_._data_[_p_.x + x][_p_.y + y] = malloc(
-                    sizeof(_POINT_)
-                );
-
-                *_data_._data_
-                    [_p_.x + x][_p_.y + y] = _p_;
-
-                _data_._cnt_ += 0x1;
-            }
-        }
-    }
+    (void)_logic_all_(
+        &_data_, _id_, _c_, _set_, &_logic_jump_
+    );
 
     return(_data_);
+}
+
+
+
+static void* _logic_is_jump_at_least_(
+    void* _data_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
+) {
+    bool* _b_ = (bool*)_data_;
+
+    *(_b_) = _logic_is_jump_one_(_id_, _c_, _p_);
+
+    return(_data_);
+}
+
+bool _logic_is_jump_at_least_all_(bool _s_) {
+    bool _b_ = 0x0;
+
+    for (int8_t y = 0x0; y < _get_board_h_(); y += 0x1)
+    for (int8_t x = 0x0; x < _get_board_w_(); x += 0x1)
+    {
+        char _c_ = _get_board_char_(x, y);
+
+        if (
+            !_game_turn_(_c_, 0x0)
+        ) { continue; }
+
+        int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
+
+        (void)_logic_all_(
+            &_b_, (_POINT_){ x, y }, _c_, _set_, &_logic_is_jump_at_least_
+        );
+
+        if (_b_) { return(_b_); }
+    }
+
+    return(_b_);
 }
 
 
@@ -358,9 +402,21 @@ bool _logic_step_(
             _old_.x, _old_.y
         );
 
+        if (
+            !_game_turn_(_c_, 0x0)
+        ) {
+            _new_ = _old_;
+
+            *(_step_) = (_STEP_){
+                _old_, _new_
+            };
+
+            return(true);
+        }
+
         _mask_jump_ = _logic_clear_mask_jump_(_mask_jump_);
 
-        _mask_jump_ = _logic_find_jump_(
+        _mask_jump_ = _logic_find_jump_all_(
             _mask_jump_, _old_, _c_
         );
 
@@ -382,13 +438,17 @@ bool _logic_step_(
                 _game_swap_(
                     (_STEP_){ _old_, _new_ }
                 );
+
+                (void)_game_turn_(_c_, true);
             } else {
                 _new_ = _old_;
             }
-        } else {
+        } else if (
+            !_logic_is_jump_at_least_all_(_get_turn_())
+        ) {
             _mask_move_ = _logic_clear_mask_move_(_mask_move_);
 
-            _mask_move_ = _logic_find_move_(
+            _mask_move_ = _logic_find_move_all_(
                 _mask_move_, _old_, _c_
             );
 
@@ -398,12 +458,16 @@ bool _logic_step_(
                 _game_swap_(
                     (_STEP_){ _old_, _new_ }
                 );
+
+                (void)_game_turn_(_c_, true);
             } else {
                 _new_ = _old_;
             }
+        } else {
+            _new_ = _old_;
         }
     } else {
-        return(false);
+        return(0x0);
     }
 
     if (

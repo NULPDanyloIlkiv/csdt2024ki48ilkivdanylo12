@@ -104,6 +104,13 @@ bool _game_q_or_k_(
     return(_b_);
 }
 
+
+
+//! get a current turn
+bool _get_turn_(void) {
+    return(_game_._flag_._turn_);
+}
+
 //! turn to make a step
 bool _game_turn_(
     char _c_, bool _s_
@@ -176,6 +183,8 @@ bool _game_init_(void) {
         _game_._board_data_ != NULL && _act_._board_data_ != NULL
     )
     {
+        _game_._flag_i_ = _act_._flag_i_;
+
         const size_t
             _size_ = _act_._board_w_ * _act_._board_h_;
 

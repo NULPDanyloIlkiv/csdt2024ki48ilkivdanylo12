@@ -41,6 +41,11 @@ bool _game_q_or_k_(
     _POINT_ _point_, bool _s_
 );
 
+
+
+//! get a current turn
+bool _get_turn_(void);
+
 //! turn to make a step
 bool _game_turn_(
     char _c_, bool _s_

@@ -33,7 +33,7 @@ bool _logic_is_move_one_(
     _POINT_ _id_, char _c_, _POINT_ _p_
 );
 
-_MASK_MOVE_ _logic_find_move_(
+_MASK_MOVE_ _logic_find_move_all_(
     _MASK_MOVE_ _data_, _POINT_ _id_, char _c_
 );
 
@@ -60,9 +60,13 @@ _MASK_JUMP_ _logic_destroy_mask_jump_(
 bool _logic_is_jump_one_(
     _POINT_ _id_, char _c_, _POINT_ _p_
 );
-_MASK_JUMP_ _logic_find_jump_(
+_MASK_JUMP_ _logic_find_jump_all_(
     _MASK_JUMP_ _data_, _POINT_ _id_, char _c_
 );
+
+
+
+bool _logic_is_jump_at_least_all_(bool _s_);
 
 
 
