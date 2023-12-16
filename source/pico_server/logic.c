@@ -299,7 +299,7 @@ static void* _logic_is_jump_at_least_(
 ) {
     bool* _b_ = (bool*)_data_;
 
-    *(_b_) = _logic_is_jump_one_(_id_, _c_, _p_);
+    *(_b_) |= _logic_is_jump_one_(_id_, _c_, _p_);
 
     return(_data_);
 }
@@ -313,7 +313,7 @@ bool _logic_is_jump_at_least_all_(bool _s_) {
         char _c_ = _get_board_char_(x, y);
 
         if (
-            !_game_turn_(_c_, 0x0)
+            !(_s_) ? (_c_ != 'W' && _c_ != 'Q') : (_c_ != 'B' && _c_ != 'K')
         ) { continue; }
 
         int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
@@ -424,6 +424,10 @@ bool _logic_step_(
             if (
                 _mask_jump_._data_[_new_.x][_new_.y] != NULL
             ) {
+                _game_swap_(
+                    (_STEP_){ _old_, _new_ }
+                );
+
                 _POINT_* _jump_ = _mask_jump_._data_
                     [_new_.x][_new_.y];
 
@@ -435,11 +439,9 @@ bool _logic_step_(
 
                 (void)_update_add_(_j_, '.');
 
-                _game_swap_(
-                    (_STEP_){ _old_, _new_ }
+                (void)_game_turn_(_c_,
+                    !_logic_is_jump_at_least_all_(_get_turn_())
                 );
-
-                (void)_game_turn_(_c_, true);
             } else {
                 _new_ = _old_;
             }
