@@ -11,8 +11,10 @@ static struct _sGame_ {
     int8_t _board_w_, _board_h_; char* _board_data_;
 
     union {
-        struct _sFlag_ { bool _turn_ : 1; } _flag_; int8_t _flag_i_;
+        struct _sFlag_ { bool _turn_ : 1; bool _combo_ : 1; } _flag_; int8_t _flag_i_;
     };
+
+    _STEP_ _mem_;
 } _game_ = {}, _act_ = {};
 
 typedef struct _sGame_ _GAME_;
@@ -59,6 +61,40 @@ int _get_board_h_(void) {
 
 
 
+//! get a flag
+int8_t _get_flag_(void) {
+    return(_game_._flag_i_);
+}
+
+//! set a flag
+int8_t _set_flag_(
+    int8_t _flag_
+) {
+    int8_t _f_ = _game_._flag_i_;
+    _game_._flag_i_ = _flag_;
+
+    return(_f_);
+}
+
+
+
+//! get a mem-step
+_STEP_ _get_mem_(void) {
+    return(_game_._mem_);
+}
+
+//! set a mem-step
+_STEP_ _set_mem_(
+    _STEP_ _step_
+) {
+    _STEP_ _s_ = _game_._mem_;
+    _game_._mem_ = _step_;
+
+    return(_s_);
+}
+
+
+
 bool _is_inside_board_(
     int x, int y
 ) {
@@ -69,8 +105,8 @@ bool _is_inside_board_(
 
 
 
-//! swap character in board
-void _game_swap_(
+//! make a step on a board
+void _game_step_(
     _STEP_ _step_
 ) {
     char _c_ = '.';
@@ -106,11 +142,6 @@ bool _game_q_or_k_(
 
 
 
-//! get a current turn
-bool _get_turn_(void) {
-    return(_game_._flag_._turn_);
-}
-
 //! turn to make a step
 bool _game_turn_(
     char _c_, bool _s_
@@ -128,6 +159,8 @@ bool _game_turn_(
 
 //! allocate memory and initialize attributes
 bool _game_create_(void) {
+    _game_ = (_GAME_){};
+
     _game_._flag_i_ = _act_._flag_i_;
 
     const uint8_t
@@ -206,6 +239,8 @@ bool _act_create_(
     uint8_t _w_, uint8_t _h_, const char* _data_
 )
 {
+    _act_ = (_GAME_){};
+
     _act_._board_w_ = _w_, _act_._board_h_ = _h_;
 
     const size_t

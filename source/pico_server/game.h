@@ -11,6 +11,10 @@
  * @brief game.h
  */
 
+enum _eFlag_ {
+    _fTURN_ = 0b0001, _fCOMBO_ = 0b0010
+};
+
 char* _get_board_data_();
 
 char _get_board_char_(
@@ -27,12 +31,32 @@ int _get_board_h_(void);
 
 
 
+//! get a flag
+int8_t _get_flag_(void);
+
+//! set a flag
+int8_t _set_flag_(
+    int8_t _flag_
+);
+
+
+
+//! get a mem-step
+_STEP_ _get_mem_(void);
+
+//! set a mem-step
+_STEP_ _set_mem_(
+    _STEP_ _step_
+);
+
+
+
 bool _is_inside_board_(
     int x, int y
 );
 
-//! swap character in board
-void _game_swap_(
+//! make a step on a board
+void _game_step_(
     _STEP_ _step_
 );
 
@@ -42,9 +66,6 @@ bool _game_q_or_k_(
 );
 
 
-
-//! get a current turn
-bool _get_turn_(void);
 
 //! turn to make a step
 bool _game_turn_(

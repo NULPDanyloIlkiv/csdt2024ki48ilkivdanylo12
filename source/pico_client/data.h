@@ -13,9 +13,9 @@
 
 //! a message -> [key + data]
 enum _eKey_ {
-    _kERROR_ = 0x0, _kINIT_ = 0x1, _kSTEP_MAKE_OLD_ = 0x2, _kSTEP_MAKE_NEW_ = 0x3, _kSTEP_BOT_ = 0x4, _kSTEP_TAKE_ = 0x5, _kUPDATE_ = 0xA,
+    _kERROR_ = 0x0, _kINIT_ = 0x1, _kTURN_ = 0x2, _kSTEP_MAKE_OLD_ = 0x3, _kSTEP_MAKE_NEW_ = 0x4, _kSTEP_BOT_ = 0x5, _kSTEP_TAKE_ = 0x6, _kUPDATE_ = 0x7,
 
-    _kMESSAGE_ = 0xF, _kRESTART_ = 0xFF
+    _kMESSAGE_ = 0x8, _kRESTART_ = 0x9
 };
 
 typedef uint8_t _KEY_;

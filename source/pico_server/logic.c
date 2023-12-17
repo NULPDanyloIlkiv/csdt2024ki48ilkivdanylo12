@@ -294,7 +294,7 @@ _MASK_JUMP_ _logic_find_jump_all_(
 
 
 
-static void* _logic_is_jump_at_least_(
+static void* _logic_is_jump_(
     void* _data_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
 ) {
     bool* _b_ = (bool*)_data_;
@@ -304,7 +304,21 @@ static void* _logic_is_jump_at_least_(
     return(_data_);
 }
 
-bool _logic_is_jump_at_least_all_(bool _s_) {
+bool _logic_is_jump_all_(
+    _POINT_ _id_, char _c_
+) {
+    bool _b_ = 0x0;
+
+    int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
+
+    (void)_logic_all_(
+        &_b_, _id_, _c_, _set_, &_logic_is_jump_
+    );
+
+    return(_b_);
+}
+
+bool _logic_is_jump_at_least_all_(bool _turn_) {
     bool _b_ = 0x0;
 
     for (int8_t y = 0x0; y < _get_board_h_(); y += 0x1)
@@ -313,13 +327,13 @@ bool _logic_is_jump_at_least_all_(bool _s_) {
         char _c_ = _get_board_char_(x, y);
 
         if (
-            !(_s_) ? (_c_ != 'W' && _c_ != 'Q') : (_c_ != 'B' && _c_ != 'K')
+            !(_turn_) ? (_c_ != 'W' && _c_ != 'Q') : (_c_ != 'B' && _c_ != 'K')
         ) { continue; }
 
         int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
 
         (void)_logic_all_(
-            &_b_, (_POINT_){ x, y }, _c_, _set_, &_logic_is_jump_at_least_
+            &_b_, (_POINT_){ x, y }, _c_, _set_, &_logic_is_jump_
         );
 
         if (_b_) { return(_b_); }
@@ -337,6 +351,9 @@ static _MASK_JUMP_
     _mask_jump_ = {};
 
 bool _logic_create_(void) {
+    _mask_move_ = (_MASK_MOVE_){};
+    _mask_jump_ = (_MASK_JUMP_){};
+
     bool _b_ = 0x0;
 
     if (
@@ -407,11 +424,7 @@ bool _logic_step_(
         ) {
             _new_ = _old_;
 
-            *(_step_) = (_STEP_){
-                _old_, _new_
-            };
-
-            return(true);
+            goto linkExit;
         }
 
         _mask_jump_ = _logic_clear_mask_jump_(_mask_jump_);
@@ -424,7 +437,19 @@ bool _logic_step_(
             if (
                 _mask_jump_._data_[_new_.x][_new_.y] != NULL
             ) {
-                _game_swap_(
+                if (_get_flag_() & _fCOMBO_) {
+                    _STEP_ _s_ = _get_mem_();
+
+                    if (
+                        !(_s_._new_.x == _old_.x && _s_._new_.y == _old_.y)
+                    ) {
+                        _new_ = _old_;
+
+                        goto linkExit;
+                    }
+                }
+
+                _game_step_(
                     (_STEP_){ _old_, _new_ }
                 );
 
@@ -439,14 +464,30 @@ bool _logic_step_(
 
                 (void)_update_add_(_j_, '.');
 
-                (void)_game_turn_(_c_,
-                    !_logic_is_jump_at_least_all_(_get_turn_())
+
+
+                if (
+                    _game_q_or_k_(_new_, true)
+                ) {
+                    _c_ = _get_board_char_(
+                        _new_.x, _new_.y
+                    );
+                }
+
+                bool _b_ = _logic_is_jump_all_(
+                    _new_, _c_
                 );
+
+                int8_t _f_ = _get_flag_();
+                _b_ ? (_f_ |= _fCOMBO_) : (_f_ &= ~(_fCOMBO_));
+                (void)_set_flag_(_f_);
+
+                (void)_game_turn_(_c_, !_b_);
             } else {
-                _new_ = _old_;
+                _new_ = _old_; goto linkExit;
             }
         } else if (
-            !_logic_is_jump_at_least_all_(_get_turn_())
+            !_logic_is_jump_at_least_all_(_get_flag_() & _fTURN_)
         ) {
             _mask_move_ = _logic_clear_mask_move_(_mask_move_);
 
@@ -457,16 +498,16 @@ bool _logic_step_(
             if (
                 _mask_move_._data_[_new_.x][_new_.y]
             ) {
-                _game_swap_(
+                _game_step_(
                     (_STEP_){ _old_, _new_ }
                 );
 
                 (void)_game_turn_(_c_, true);
             } else {
-                _new_ = _old_;
+                _new_ = _old_; goto linkExit;
             }
         } else {
-            _new_ = _old_;
+            _new_ = _old_; goto linkExit;
         }
     } else {
         return(0x0);
@@ -481,6 +522,11 @@ bool _logic_step_(
         );
     }
 
+    _set_mem_(
+        (_STEP_){ _old_, _new_ }
+    );
+
+linkExit:
     *(_step_) = (_STEP_){
         _old_, _new_
     };

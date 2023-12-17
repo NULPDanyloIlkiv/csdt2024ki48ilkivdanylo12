@@ -358,6 +358,16 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
         select = nullptr;
     }
 
+    if (_update_) {
+        if (
+            !_UpdateData_()
+        ) { /*Code...*/ }
+
+        _update_ = 0x0;
+    }
+
+
+
     vec2f vecMouseBeforeZoomPos = _DisplayToWorld_(
         _vMOUSE_.x, _vMOUSE_.y
     );

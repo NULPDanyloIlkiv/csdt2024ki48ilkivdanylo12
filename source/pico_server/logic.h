@@ -66,7 +66,11 @@ _MASK_JUMP_ _logic_find_jump_all_(
 
 
 
-bool _logic_is_jump_at_least_all_(bool _s_);
+bool _logic_is_jump_all_(
+    _POINT_ _id_, char _c_
+);
+
+bool _logic_is_jump_at_least_all_(bool _turn_);
 
 
 

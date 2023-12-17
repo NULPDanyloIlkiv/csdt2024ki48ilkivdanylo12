@@ -22,6 +22,11 @@ bool _server_init_(void);
 
 
 
+//! turn to make a step
+bool _server_turn_(void);
+
+
+
 //! player select a checker -  save it -> _old_
 bool _server_step_make_old_(void);
 

@@ -64,6 +64,19 @@ bool _server_init_(void)
 
 
 
+//! turn to make a step
+bool _server_turn_(void) {
+    bool _turn_ = _get_flag_() & _fTURN_;
+
+    (void)_com_send_data_(
+        _kTURN_, &_turn_, 0x1, sizeof(_turn_)
+    );
+
+    return(true);
+}
+
+
+
 static _POINT_
     _old_ = {},
     _new_ = {};
@@ -212,6 +225,11 @@ bool _server_update_(_KEY_ _key_)
 
     case(_kINIT_):
         { _state_ = _server_init_(); } break;
+
+
+
+    case(_kTURN_):
+        { _state_ = _server_turn_(); } break;
 
 
 
