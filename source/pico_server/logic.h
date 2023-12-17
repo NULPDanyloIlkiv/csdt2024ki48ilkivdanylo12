@@ -11,6 +11,10 @@
  * @brief logic.h
  */
 
+void* _logic_all_(
+    void* _data_, _POINT_ _id_, char _c_, int8_t _set_, void* (_f_)(void*, _POINT_, char, _POINT_, int8_t, int8_t)
+);
+
 typedef struct {
     size_t _w_, _h_; bool** _data_; size_t _cnt_;
 } _MASK_MOVE_;

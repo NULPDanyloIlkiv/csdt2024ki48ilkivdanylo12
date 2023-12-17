@@ -80,7 +80,7 @@ size_t _com_send_(
 
 
 
-//! reading the key used to identify the data
+//! reading a key used to identify a data
 _KEY_ _com_recv_key_(void) {
     _KEY_ _key_ = _kERROR_;
 
@@ -89,6 +89,13 @@ _KEY_ _com_recv_key_(void) {
     );
 
     return(_key_);
+}
+
+//! writing a key used to identify a data
+void _com_send_key_(_KEY_ _key_) {
+    (void)_com_send_(
+        &_key_, 0x1, sizeof(_key_)
+    );
 }
 
 

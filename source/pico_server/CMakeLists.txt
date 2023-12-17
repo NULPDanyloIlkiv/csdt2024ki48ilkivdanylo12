@@ -28,9 +28,4 @@ pico_add_extra_outputs(main)
 
 
 
-include_directories(
-    "C/Users/User/pico-project/prj_1"
-)
-include_directories(
-    "C:/Users/User/Documents/CodeBlocks/[TRIVIAL]-1"
-)
+include_directories(".")

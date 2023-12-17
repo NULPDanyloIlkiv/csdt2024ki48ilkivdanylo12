@@ -257,6 +257,14 @@ LRESULT _cEngine_::HandleMessage(UINT _In_ uMsg,
 
         } break;
 
+        case(VK_TAB): {
+            client->_step_bot_();
+
+            client->_step_take_();
+
+            _update_ = true;
+        } break;
+
         default:
             break;
         }

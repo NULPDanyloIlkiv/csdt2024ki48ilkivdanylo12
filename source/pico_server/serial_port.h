@@ -25,8 +25,11 @@ size_t _com_send_(
 
 typedef uint8_t _KEY_;
 
-//! reading the key used to identify the data
+//! reading a key used to identify a data
 _KEY_ _com_recv_key_(void);
+
+//! writing a key used to identify a data
+void _com_send_key_(_KEY_ _key_);
 
 
 

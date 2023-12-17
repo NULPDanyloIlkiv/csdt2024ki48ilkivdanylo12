@@ -10,7 +10,7 @@
  * @brief logic.c
  */
 
-static void* _logic_all_(
+void* _logic_all_(
     void* _data_, _POINT_ _id_, char _c_, int8_t _set_, void* (_f_)(void*, _POINT_, char, _POINT_, int8_t, int8_t)
 ) {
     if (_set_ != 0x0) {
@@ -148,7 +148,7 @@ _MASK_MOVE_ _logic_find_move_all_(
     _MASK_MOVE_ _data_, _POINT_ _id_, char _c_
 )
 {
-    int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
+    int8_t _set_ = _game_set_(_c_);
 
     (void)_logic_all_(
         &_data_, _id_, _c_, _set_, &_logic_move_
@@ -283,7 +283,7 @@ _MASK_JUMP_ _logic_find_jump_all_(
     _MASK_JUMP_ _data_, _POINT_ _id_, char _c_
 )
 {
-    int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
+    int8_t _set_ = _game_set_(_c_);
 
     (void)_logic_all_(
         &_data_, _id_, _c_, _set_, &_logic_jump_
@@ -309,7 +309,7 @@ bool _logic_is_jump_all_(
 ) {
     bool _b_ = 0x0;
 
-    int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
+    int8_t _set_ = _game_set_(_c_);
 
     (void)_logic_all_(
         &_b_, _id_, _c_, _set_, &_logic_is_jump_
@@ -330,7 +330,7 @@ bool _logic_is_jump_at_least_all_(bool _turn_) {
             !(_turn_) ? (_c_ != 'W' && _c_ != 'Q') : (_c_ != 'B' && _c_ != 'K')
         ) { continue; }
 
-        int8_t _set_ = (_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0';
+        int8_t _set_ = _game_set_(_c_);
 
         (void)_logic_all_(
             &_b_, (_POINT_){ x, y }, _c_, _set_, &_logic_is_jump_

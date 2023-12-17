@@ -213,7 +213,27 @@ void _cClient_::_step_make_(
 
 //! send a message that stores a [key + data] indicating the execution of a bot move
 void _cClient_::_step_bot_(void) {
-    /*Code...*/
+    _com_send_key_(
+        &m_sp, _kSTEP_BOT_
+    );
+
+    (void)_handle_key_data_(_kSTEP_BOT_, [&](void)
+        {
+            _STEP_ _s_ = {
+                { 0x0 }, { 0x0 }
+            };
+
+            size_t _bytes_recv_ = 0x0;
+
+            _bytes_recv_ += _com_recv_(
+                &m_sp, &_s_, 0x1, sizeof(_s_)
+            );
+
+            fwprintf(stderr, L"__BYTES_RECV__ : %i.b | BOT : OLD | NEW : %d %d -> %d %d\n",
+                _bytes_recv_, _s_._old_.x, _s_._old_.y, _s_._new_.x, _s_._new_.y
+            );
+        }
+    );
 }
 
 

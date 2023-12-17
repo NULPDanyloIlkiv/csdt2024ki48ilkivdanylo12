@@ -5,6 +5,8 @@
 #include "game.h"
 #include "logic.h"
 
+#include "bot.h"
+
 #include "update.h"
 
 /**
@@ -127,6 +129,22 @@ bool _server_step_make_new_(void) {
 
 //! execute a bot move and save it -> _old_ | _new_
 bool _server_step_bot_(void) {
+    if (
+        !_bot_step_(_get_flag_() & _fTURN_, &_old_, &_new_)
+    ) {
+        (void)_com_send_message_(
+            "__ERROR__ - Invalid _data_"
+        ); return(0x0);
+    }
+
+    _STEP_ _step_ = (_STEP_) {
+        _old_, _new_
+    };
+
+    (void)_com_send_data_(
+        _kSTEP_BOT_, &_step_, 0x1, sizeof(_step_)
+    );
+
     return(true);
 }
 
