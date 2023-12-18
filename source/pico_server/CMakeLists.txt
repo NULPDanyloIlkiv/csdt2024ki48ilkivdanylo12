@@ -9,13 +9,13 @@ project(pico_project)
 pico_sdk_init()
 
 add_executable(main
-	main.c
+	main.c server.c game.c logic.c bot.c data.c update.c serial_port.c
 )
 
 
 
 target_link_libraries(main
-    pico_stdio pico_stdlib pico_malloc
+    pico_stdio pico_stdlib pico_malloc hardware_uart m
 )
 
 
@@ -28,9 +28,4 @@ pico_add_extra_outputs(main)
 
 
 
-include_directories(
-    "C/Users/User/pico-project/pico_server"
-)
-include_directories(
-    "C:/Users/User/Documents/CodeBlocks/[TRIVIAL]-1"
-)
+include_directories(".")
