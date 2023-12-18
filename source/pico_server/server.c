@@ -16,14 +16,14 @@
  */
 
 //! allocate memory and initialize attributes
-bool _server_create_(void) {
+static bool _server_create_(void) {
     return(
         _logic_create_()
     );
 }
 
 //! free allocated memory
-bool _server_destroy_(void) {
+static bool _server_destroy_(void) {
     return(
         _logic_destroy_()
     );
@@ -32,7 +32,7 @@ bool _server_destroy_(void) {
 
 
 //! initialize a new game
-bool _server_init_(void)
+static bool _server_request_init_(void)
 {
     _INIT_ _init_ = {
         _get_board_w_(), _get_board_h_()
@@ -67,7 +67,7 @@ bool _server_init_(void)
 
 
 //! turn to make a step
-bool _server_turn_(void) {
+static bool _server_request_turn_(void) {
     bool _turn_ = _get_flag_() & _fTURN_;
 
     (void)_com_send_data_(
@@ -84,7 +84,7 @@ static _POINT_
     _new_ = {};
 
 //! player select a checker -  save it -> _old_
-bool _server_step_make_old_(void) {
+static bool _server_request_step_make_old_(void) {
     (void)_com_recv_(
         &_old_, 0x1, sizeof(_old_)
     );
@@ -106,7 +106,7 @@ bool _server_step_make_old_(void) {
 }
 
 //! player move a checker -  save it -> _new_
-bool _server_step_make_new_(void) {
+static bool _server_request_step_make_new_(void) {
     (void)_com_recv_(
         &_new_, 0x1, sizeof(_new_)
     );
@@ -128,7 +128,7 @@ bool _server_step_make_new_(void) {
 }
 
 //! execute a bot move and save it -> _old_ | _new_
-bool _server_step_bot_(void) {
+static bool _server_request_step_bot_(void) {
     if (
         !_bot_step_(_get_flag_() & _fTURN_, &_old_, &_new_)
     ) {
@@ -151,7 +151,7 @@ bool _server_step_bot_(void) {
 
 
 //! make a move and check the result of a move
-bool _server_step_take_(void) {
+static bool _server_request_step_take_(void) {
     _STEP_ _step_ = {};
 
     if (
@@ -184,7 +184,7 @@ bool _server_step_take_(void) {
 
 
 //! ping the connection with a client
-bool _server_ping_(void) {
+static bool _server_request_ping_(void) {
     char _char_[_MSG_SIZE_] = { 0x0 };
 
     (void)_com_recv_(
@@ -199,7 +199,7 @@ bool _server_ping_(void) {
 }
 
 //! restart the connection with a client
-bool _server_restart_(void) {
+static bool _server_request_restart_(void) {
     _KEY_ _key_ = _kRESTART_;
 
     (void)_com_send_(
@@ -215,7 +215,7 @@ bool _server_restart_(void) {
 
 static bool _active_ = 0x0;
 
-bool _server_update_(_KEY_ _key_)
+static bool _server_update_(_KEY_ _key_)
 {
     bool _state_ = 0x0;
 
@@ -223,36 +223,36 @@ bool _server_update_(_KEY_ _key_)
     {
 
     case(_kRESTART_): {
-        _state_ = _server_restart_();
+        _state_ = _server_request_restart_();
     } break;
 
 
 
     case(_kSTEP_MAKE_OLD_):
-        { _state_ = _server_step_make_old_(); } break;
+        { _state_ = _server_request_step_make_old_(); } break;
     case(_kSTEP_MAKE_NEW_):
-        { _state_ = _server_step_make_new_(); } break;
+        { _state_ = _server_request_step_make_new_(); } break;
 
     case(_kSTEP_BOT_):
-        { _state_ = _server_step_bot_(); } break;
+        { _state_ = _server_request_step_bot_(); } break;
 
     case(_kSTEP_TAKE_):
-        { _state_ = _server_step_take_(); } break;
+        { _state_ = _server_request_step_take_(); } break;
 
 
 
     case(_kINIT_):
-        { _state_ = _server_init_(); } break;
+        { _state_ = _server_request_init_(); } break;
 
 
 
     case(_kTURN_):
-        { _state_ = _server_turn_(); } break;
+        { _state_ = _server_request_turn_(); } break;
 
 
 
     case(_kMESSAGE_):
-        { _state_ = _server_ping_(); } break;
+        { _state_ = _server_request_ping_(); } break;
 
 
 
@@ -275,7 +275,18 @@ bool _server_update_(_KEY_ _key_)
     return(_state_);
 }
 
+//!#define _COM_UART_
+
+#ifdef _COM_UART_
+#define _BAUD_RATE_ 115200
+#endif // _COM_UART_
+
+//! a server working in a loop and reply to requests sent by a client
 bool _server_loop_(void) {
+#ifdef _COM_UART_
+    (void)_uart_init_(_BAUD_RATE_);
+#endif // _COM_UART_
+
     _active_ = true;
 
     _active_ &= _server_create_();

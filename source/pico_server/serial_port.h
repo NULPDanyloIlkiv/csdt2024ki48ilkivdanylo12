@@ -5,11 +5,20 @@
 
 #include "data.h"
 
+//! #define _COM_UART_
+
 /**
  * @file
  *
  * @brief serial_port.h
  */
+
+#ifdef _COM_UART_
+
+//! UART interface initialization
+uint16_t _uart_init_(uint16_t _rate_);
+
+#endif // _COM_UART_
 
 //! reading bytes from the COM port data stream
 size_t _com_recv_(

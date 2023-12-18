@@ -65,8 +65,11 @@ bool _game_q_or_k_(
     _POINT_ _point_, bool _s_
 );
 
-//! a direction of movement | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
-int8_t _game_set_(char _c_);
+//! a direction of move | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
+int8_t _game_set_move_(char _c_);
+
+//! a direction of jump | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
+int8_t _game_set_jump_(char _c_);
 
 
 

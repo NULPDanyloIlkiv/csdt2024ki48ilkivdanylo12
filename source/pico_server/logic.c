@@ -41,14 +41,12 @@ void* _logic_all_(
     return(_data_);
 }
 
-
-
-_MASK_MOVE_ _logic_create_mask_move_(
-    _MASK_MOVE_ _data_
+_MASK_ _logic_create_mask_(
+    _MASK_ _data_, size_t _size_
 )
 {
     _data_._data_ = malloc(
-        sizeof(bool*) * _data_._w_
+        sizeof(void*) * _data_._w_
     );
 
     if (
@@ -60,7 +58,7 @@ _MASK_MOVE_ _logic_create_mask_move_(
     )
     {
         _data_._data_[i] = calloc(
-            _data_._h_, sizeof(bool)
+            _data_._h_, _size_
         );
 
         if (
@@ -71,15 +69,30 @@ _MASK_MOVE_ _logic_create_mask_move_(
                  size_t j = 0x0; j < i; j += 0x1
             ) { free(_data_._data_[j]); _data_._data_[j] = NULL; }
 
-            free(_data_._data_); _data_ = (_MASK_MOVE_){};
+            free(_data_._data_); _data_ = (_MASK_){};
         }
     }
 
     return(_data_);
 }
 
-_MASK_MOVE_ _logic_clear_mask_move_(
-    _MASK_MOVE_ _data_
+_MASK_ _logic_destroy_mask_(
+    _MASK_ _data_
+)
+{
+    for (
+        size_t i = 0x0; i < _data_._w_; i += 0x1
+    ) { free(_data_._data_[i]); _data_._data_[i] = NULL; }
+
+    free(_data_._data_); _data_ = (_MASK_){};
+
+    return(_data_);
+}
+
+
+
+static _MASK_ _logic_clear_move_(
+    _MASK_ _data_
 )
 {
     for (
@@ -87,22 +100,9 @@ _MASK_MOVE_ _logic_clear_mask_move_(
     )
     for (
         int8_t y = 0x0; y < _data_._h_; y += 0x1
-    ) { _data_._data_[x][y] = NULL; }
+    ) { ((bool**)(_data_._data_))[x][y] = 0x0; }
 
     _data_._cnt_ = 0x0;
-
-    return(_data_);
-}
-
-_MASK_MOVE_ _logic_destroy_mask_move_(
-    _MASK_MOVE_ _data_
-)
-{
-    for (
-        size_t i = 0x0; i < _data_._w_; i += 0x1
-    ) { free(_data_._data_[i]); _data_._data_[i] = NULL; }
-
-    free(_data_._data_); _data_ = (_MASK_MOVE_){};
 
     return(_data_);
 }
@@ -112,16 +112,16 @@ _MASK_MOVE_ _logic_destroy_mask_move_(
 static void* _logic_move_(
     void* _data_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
 ) {
-    _MASK_MOVE_* _mask_move_ = (_MASK_MOVE_*)_data_;
+    _MASK_* _mask_ = (_MASK_*)_data_;
 
     if (
         _is_inside_board_(_p_.x, _p_.y)
     ) {
-        _mask_move_->_data_[_p_.x][_p_.y] = _logic_is_move_one_(
+        ((bool**)(_mask_->_data_))[_p_.x][_p_.y] = _logic_is_move_one_(
             _id_, _c_, _p_
         );
 
-        _mask_move_->_cnt_ += 0x1;
+        _mask_->_cnt_ += 0x1;
     }
 
     return(_data_);
@@ -144,11 +144,11 @@ bool _logic_is_move_one_(
     }
 }
 
-_MASK_MOVE_ _logic_find_move_all_(
-    _MASK_MOVE_ _data_, _POINT_ _id_, char _c_
+_MASK_ _logic_find_move_all_(
+    _MASK_ _data_, _POINT_ _id_, char _c_
 )
 {
-    int8_t _set_ = _game_set_(_c_);
+    int8_t _set_ = _game_set_move_(_c_);
 
     (void)_logic_all_(
         &_data_, _id_, _c_, _set_, &_logic_move_
@@ -159,43 +159,8 @@ _MASK_MOVE_ _logic_find_move_all_(
 
 
 
-_MASK_JUMP_ _logic_create_mask_jump_(
-    _MASK_JUMP_ _data_
-)
-{
-    _data_._data_ = malloc(
-        sizeof(_POINT_**) * _data_._w_
-    );
-
-    if (
-        !_data_._data_
-    ) { return(_data_); }
-
-    for (
-        size_t i = 0x0; i < _data_._w_; i += 0x1
-    )
-    {
-        _data_._data_[i] = calloc(
-            _data_._h_, sizeof(_POINT_*)
-        );
-
-        if (
-            !_data_._data_[i]
-        )
-        {
-            for (
-                 size_t j = 0x0; j < i; j += 0x1
-            ) { free(_data_._data_[j]); _data_._data_[j] = NULL; }
-
-            free(_data_._data_); _data_ = (_MASK_JUMP_){};
-        }
-    }
-
-    return(_data_);
-}
-
-_MASK_JUMP_ _logic_clear_mask_jump_(
-    _MASK_JUMP_ _data_
+static _MASK_ _logic_clear_jump_(
+    _MASK_ _data_
 )
 {
     for (
@@ -203,22 +168,11 @@ _MASK_JUMP_ _logic_clear_mask_jump_(
     )
     for (
         int8_t y = 0x0; y < _data_._h_; y += 0x1
-    ) { free(_data_._data_[x][y]); _data_._data_[x][y] = NULL; }
+    ) { free(((_POINT_***)(_data_._data_))[x][y]); ((_POINT_***)(_data_._data_))[x][y] = NULL; }
 
     _data_._cnt_ = 0x0;
 
     return(_data_);
-}
-
-_MASK_JUMP_ _logic_destroy_mask_jump_(
-    _MASK_JUMP_ _data_
-)
-{
-    for (
-        int8_t i = 0x0; i < _data_._w_; i += 0x1
-    ) { free(_data_._data_[i]); _data_._data_[i] = NULL; }
-
-    free(_data_._data_); _data_ = (_MASK_JUMP_){};
 }
 
 
@@ -226,19 +180,19 @@ _MASK_JUMP_ _logic_destroy_mask_jump_(
 static void* _logic_jump_(
     void* _data_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
 ) {
-    _MASK_JUMP_* _mask_jump_ = (_MASK_JUMP_*)_data_;
+    _MASK_* _mask_ = (_MASK_*)_data_;
 
     if (
         _logic_is_jump_one_(_id_, _c_, _p_)
     ) {
-        _mask_jump_->_data_[_p_.x + x][_p_.y + y] = malloc(
+        ((_POINT_***)(_mask_->_data_))[_p_.x + x][_p_.y + y] = malloc(
             sizeof(_POINT_)
         );
 
-        *_mask_jump_->_data_
+        *((_POINT_***)(_mask_->_data_))
             [_p_.x + x][_p_.y + y] = _p_;
 
-        _mask_jump_->_cnt_ += 0x1;
+        _mask_->_cnt_ += 0x1;
     }
 
     return(_data_);
@@ -279,11 +233,11 @@ bool _logic_is_jump_one_(
     }
 }
 
-_MASK_JUMP_ _logic_find_jump_all_(
-    _MASK_JUMP_ _data_, _POINT_ _id_, char _c_
+_MASK_ _logic_find_jump_all_(
+    _MASK_ _data_, _POINT_ _id_, char _c_
 )
 {
-    int8_t _set_ = _game_set_(_c_);
+    int8_t _set_ = _game_set_jump_(_c_);
 
     (void)_logic_all_(
         &_data_, _id_, _c_, _set_, &_logic_jump_
@@ -309,7 +263,7 @@ bool _logic_is_jump_all_(
 ) {
     bool _b_ = 0x0;
 
-    int8_t _set_ = _game_set_(_c_);
+    int8_t _set_ = _game_set_jump_(_c_);
 
     (void)_logic_all_(
         &_b_, _id_, _c_, _set_, &_logic_is_jump_
@@ -330,7 +284,7 @@ bool _logic_is_jump_at_least_all_(bool _turn_) {
             !(_turn_) ? (_c_ != 'W' && _c_ != 'Q') : (_c_ != 'B' && _c_ != 'K')
         ) { continue; }
 
-        int8_t _set_ = _game_set_(_c_);
+        int8_t _set_ = _game_set_jump_(_c_);
 
         (void)_logic_all_(
             &_b_, (_POINT_){ x, y }, _c_, _set_, &_logic_is_jump_
@@ -344,15 +298,15 @@ bool _logic_is_jump_at_least_all_(bool _turn_) {
 
 
 
-static _MASK_MOVE_
+static _MASK_
     _mask_move_ = {};
 
-static _MASK_JUMP_
+static _MASK_
     _mask_jump_ = {};
 
 bool _logic_create_(void) {
-    _mask_move_ = (_MASK_MOVE_){};
-    _mask_jump_ = (_MASK_JUMP_){};
+    _mask_move_ = (_MASK_){};
+    _mask_jump_ = (_MASK_){};
 
     bool _b_ = 0x0;
 
@@ -367,15 +321,15 @@ bool _logic_create_(void) {
         _mask_move_._w_ = _point_.x;
         _mask_move_._h_ = _point_.y;
 
-        _mask_move_ = _logic_create_mask_move_(
-            _mask_move_
+        _mask_move_ = _logic_create_mask_(
+            _mask_move_, sizeof(bool)
         );
 
         _mask_jump_._w_ = _point_.x;
         _mask_jump_._h_ = _point_.y;
 
-        _mask_jump_ = _logic_create_mask_jump_(
-            _mask_jump_
+        _mask_jump_ = _logic_create_mask_(
+            _mask_jump_, sizeof(_POINT_*)
         );
 
         _b_ = true;
@@ -393,12 +347,15 @@ bool _logic_destroy_(void) {
         _game_destroy_()
     )
     {
-        _mask_move_ = _logic_destroy_mask_move_(
+        _mask_move_ = _logic_destroy_mask_(
             _mask_move_
         );
-        _mask_jump_ = _logic_destroy_mask_jump_(
+        _mask_move_ = (_MASK_){};
+
+        _mask_jump_ = _logic_destroy_mask_(
             _mask_jump_
         );
+        _mask_jump_ = (_MASK_){};
 
         _b_ = true;
     } else {
@@ -427,7 +384,7 @@ bool _logic_step_(
             goto linkExit;
         }
 
-        _mask_jump_ = _logic_clear_mask_jump_(_mask_jump_);
+        _mask_jump_ = _logic_clear_jump_(_mask_jump_);
 
         _mask_jump_ = _logic_find_jump_all_(
             _mask_jump_, _old_, _c_
@@ -435,13 +392,13 @@ bool _logic_step_(
 
         if (_mask_jump_._cnt_ != 0x0) {
             if (
-                _mask_jump_._data_[_new_.x][_new_.y] != NULL
+                ((_POINT_***)(_mask_jump_._data_))[_new_.x][_new_.y] != NULL
             ) {
                 if (_get_flag_() & _fCOMBO_) {
-                    _STEP_ _s_ = _get_mem_();
+                    _STEP_ _mem_ = _get_mem_();
 
                     if (
-                        !(_s_._new_.x == _old_.x && _s_._new_.y == _old_.y)
+                        !(_old_.x == _mem_._new_.x && _old_.y == _mem_._new_.y)
                     ) {
                         _new_ = _old_;
 
@@ -453,7 +410,7 @@ bool _logic_step_(
                     (_STEP_){ _old_, _new_ }
                 );
 
-                _POINT_* _jump_ = _mask_jump_._data_
+                _POINT_* _jump_ = ((_POINT_***)(_mask_jump_._data_))
                     [_new_.x][_new_.y];
 
                 _POINT_ _j_ = *(_jump_);
@@ -489,14 +446,14 @@ bool _logic_step_(
         } else if (
             !_logic_is_jump_at_least_all_(_get_flag_() & _fTURN_)
         ) {
-            _mask_move_ = _logic_clear_mask_move_(_mask_move_);
+            _mask_move_ = _logic_clear_move_(_mask_move_);
 
             _mask_move_ = _logic_find_move_all_(
                 _mask_move_, _old_, _c_
             );
 
             if (
-                _mask_move_._data_[_new_.x][_new_.y]
+                ((bool**)(_mask_move_._data_))[_new_.x][_new_.y]
             ) {
                 _game_step_(
                     (_STEP_){ _old_, _new_ }

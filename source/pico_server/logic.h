@@ -16,19 +16,15 @@ void* _logic_all_(
 );
 
 typedef struct {
-    size_t _w_, _h_; bool** _data_; size_t _cnt_;
-} _MASK_MOVE_;
+    size_t _w_, _h_; void** _data_; size_t _cnt_;
+} _MASK_;
 
-_MASK_MOVE_ _logic_create_mask_move_(
-    _MASK_MOVE_ _data_
+_MASK_ _logic_create_mask_(
+    _MASK_ _data_, size_t _size_
 );
 
-_MASK_MOVE_ _logic_clear_mask_move_(
-    _MASK_MOVE_ _data_
-);
-
-_MASK_MOVE_ _logic_destroy_mask_move_(
-    _MASK_MOVE_ _data_
+_MASK_ _logic_destroy_mask_(
+    _MASK_ _data_
 );
 
 
@@ -37,26 +33,8 @@ bool _logic_is_move_one_(
     _POINT_ _id_, char _c_, _POINT_ _p_
 );
 
-_MASK_MOVE_ _logic_find_move_all_(
-    _MASK_MOVE_ _data_, _POINT_ _id_, char _c_
-);
-
-
-
-typedef struct {
-    size_t _w_, _h_; _POINT_*** _data_; size_t _cnt_;
-} _MASK_JUMP_;
-
-_MASK_JUMP_ _logic_create_mask_jump_(
-    _MASK_JUMP_ _data_
-);
-
-_MASK_JUMP_ _logic_clear_mask_jump_(
-    _MASK_JUMP_ _data_
-);
-
-_MASK_JUMP_ _logic_destroy_mask_jump_(
-    _MASK_JUMP_ _data_
+_MASK_ _logic_find_move_all_(
+    _MASK_ _data_, _POINT_ _id_, char _c_
 );
 
 
@@ -64,8 +42,8 @@ _MASK_JUMP_ _logic_destroy_mask_jump_(
 bool _logic_is_jump_one_(
     _POINT_ _id_, char _c_, _POINT_ _p_
 );
-_MASK_JUMP_ _logic_find_jump_all_(
-    _MASK_JUMP_ _data_, _POINT_ _id_, char _c_
+_MASK_ _logic_find_jump_all_(
+    _MASK_ _data_, _POINT_ _id_, char _c_
 );
 
 

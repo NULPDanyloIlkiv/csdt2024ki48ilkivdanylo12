@@ -15,7 +15,7 @@ add_executable(main
 
 
 target_link_libraries(main
-    pico_stdio pico_stdlib pico_malloc m
+    pico_stdio pico_stdlib pico_malloc hardware_uart m
 )
 
 

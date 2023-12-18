@@ -97,6 +97,19 @@ static void* _bot_is_move_(
 static void* _bot_is_jump_(
     void* _data_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
 ) {
+    void* _res_ = _data_;
+    if (!_res_) { return(_res_); }
+
+    bool _combo_ = 0x0;
+
+    if (
+        _get_flag_() & _fCOMBO_
+    ) {
+        _STEP_ _mem_ = _get_mem_();
+
+        _combo_ = (_id_.x == _mem_._new_.x) && (_id_.y == _mem_._new_.y);
+    }
+
     _DATA_* _jump_ = (_DATA_*)_data_;
 
     if (
@@ -108,12 +121,18 @@ static void* _bot_is_jump_(
         _step_[_jump_->_cnt_ - 0x1] = (_STEP_){
             _id_, (_POINT_){ _p_.x + x, _p_.y + y}
         };
+
+        if (_combo_) { _res_ = NULL; }
     }
 
-    return(_data_);
+    return(_res_);
 }
 
 
+
+static int8_t (*_s_[0x2])(char) = {
+    &_game_set_jump_, &_game_set_move_
+};
 
 bool _bot_step_(
     bool _turn_, _POINT_* _old_, _POINT_* _new_
@@ -142,13 +161,15 @@ bool _bot_step_(
             for (
                 size_t i = 0x0; i < _cnt_; i += 0x1
             ) {
-                _CHECKER_ _c_ = _data_[i];
+                _CHECKER_ _ch_ = _data_[i];
 
-                int8_t _set_ = _game_set_(_c_._c_);
+                int8_t _set_ = _s_[j](_ch_._c_);
 
-                (void)_logic_all_(
-                    &_step_, _c_._id_, _c_._c_, _set_, _f_[j]
+                void* _res_ = _logic_all_(
+                    &_step_, _ch_._id_, _ch_._c_, _set_, _f_[j]
                 );
+
+                if (!_res_) { break; }
             }
 
             if (

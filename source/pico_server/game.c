@@ -140,8 +140,12 @@ bool _game_q_or_k_(
     return(_b_);
 }
 
-//! a direction of movement | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
-int8_t _game_set_(char _c_) {
+//! a direction of move | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
+int8_t _game_set_move_(char _c_) {
+    return((_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0');
+}
+//! a direction of jump | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
+int8_t _game_set_jump_(char _c_) {
     return((_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0');
 }
 
@@ -164,8 +168,6 @@ bool _game_turn_(
 
 //! allocate memory and initialize attributes
 bool _game_create_(void) {
-    _game_ = (_GAME_){};
-
     _game_._flag_i_ = _act_._flag_i_;
 
     const uint8_t
@@ -204,6 +206,8 @@ bool _game_destroy_(void) {
         free(
             _game_._board_data_
         ); _game_._board_data_ = NULL;
+
+        _game_ = (_GAME_){};
 
         _b_ = true;
     } else {
@@ -244,8 +248,6 @@ bool _act_create_(
     uint8_t _w_, uint8_t _h_, const char* _data_
 )
 {
-    _act_ = (_GAME_){};
-
     _act_._board_w_ = _w_, _act_._board_h_ = _h_;
 
     const size_t
@@ -277,6 +279,8 @@ bool _act_destroy_(void) {
         free(
             _act_._board_data_
         ); _act_._board_data_ = NULL;
+
+        _act_ = (_GAME_){};
 
         _b_ = true;
     } else {
