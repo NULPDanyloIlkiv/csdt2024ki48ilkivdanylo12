@@ -6,108 +6,9 @@
  * @brief game.c
  */
 
-//! structure that store information about the game
-static struct _sGame_ {
-    int8_t _board_w_, _board_h_; char* _board_data_;
-
-    union {
-        struct _sFlag_ { bool _turn_ : 1; bool _combo_ : 1; } _flag_; int8_t _flag_i_;
-    };
-
-    _STEP_ _mem_;
-} _game_ = {}, _act_ = {};
-
-typedef struct _sGame_ _GAME_;
-
-
-
-char* _get_board_data_(void) {
-    return(
-        _game_._board_data_
-    );
-}
-
-char _get_board_char_(
-    int8_t x, int8_t y
-)
-{
-    return(
-        _game_._board_data_[x + (y * _game_._board_w_)]
-    );
-}
-
-char _set_board_char_(
-    int8_t x, int8_t y, char _new_
-)
-{
-    size_t i = x + (
-        y * _game_._board_w_
-    );
-
-    char _old_ = '.';
-    _old_ = _game_._board_data_[i];
-
-    _game_._board_data_[i] = _new_;
-
-    return(_old_);
-}
-
-int _get_board_w_(void) {
-    return(_game_._board_w_);
-}
-int _get_board_h_(void) {
-    return(_game_._board_h_);
-}
-
-
-
-//! get a flag
-int8_t _get_flag_(void) {
-    return(_game_._flag_i_);
-}
-
-//! set a flag
-int8_t _set_flag_(
-    int8_t _flag_
-) {
-    int8_t _f_ = _game_._flag_i_;
-    _game_._flag_i_ = _flag_;
-
-    return(_f_);
-}
-
-
-
-//! get a mem-step
-_STEP_ _get_mem_(void) {
-    return(_game_._mem_);
-}
-
-//! set a mem-step
-_STEP_ _set_mem_(
-    _STEP_ _step_
-) {
-    _STEP_ _s_ = _game_._mem_;
-    _game_._mem_ = _step_;
-
-    return(_s_);
-}
-
-
-
-bool _is_inside_board_(
-    int x, int y
-) {
-    return(
-        x >= 0x0 && x < _game_._board_w_ && y >= 0x0 && y < _game_._board_h_
-    );
-}
-
-
-
 //! make a step on a board
 void _game_step_(
-    _STEP_ _step_
+    _GAME_* _game_, _STEP_ _step_
 ) {
     char _c_ = '.';
 
@@ -117,48 +18,41 @@ void _game_step_(
 
     for (
         size_t i = 0x0; i < 0x2; i += 0x1
-    ) { _c_ = _set_board_char_(_p_[i].x, _p_[i].y, _c_); }
+    ) { _c_ = _set_board_char_(_game_->_board_, _p_[i].x, _p_[i].y, _c_); }
 }
+
+
 
 //! make a mortal man queen or king
 bool _game_q_or_k_(
-    _POINT_ _point_, bool _s_
+    _GAME_* _game_, _POINT_ _point_, bool _s_
 ) {
     char _c_ = _get_board_char_(
-        _point_.x, _point_.y
+        _game_->_board_,  _point_.x, _point_.y
     );
 
     bool _b_ = (
-        _point_.y == ((_c_ == 'W') || (_c_ == 'Q') ? (_c_ = 'Q', _game_._board_h_ - 0x1) : (_c_ == 'B') || (_c_ == 'K') ? (_c_ = 'K', 0x0) : -0x1)
+        _point_.y == ((_c_ == 'W') || (_c_ == 'Q') ? (_c_ = 'Q', _game_->_board_._h_ - 0x1) : (_c_ == 'B') || (_c_ == 'K') ? (_c_ = 'K', 0x0) : -0x1)
     );
 
     if (_s_ && _b_)
         _set_board_char_(
-            _point_.x, _point_.y, _c_
+            _game_->_board_, _point_.x, _point_.y, _c_
         );
 
     return(_b_);
-}
-
-//! a direction of move | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
-int8_t _game_set_move_(char _c_) {
-    return((_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0');
-}
-//! a direction of jump | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
-int8_t _game_set_jump_(char _c_) {
-    return((_c_ == 'W') ? 0x1 : (_c_ == 'B') ? -0x1 : '\0');
 }
 
 
 
 //! turn to make a step
 bool _game_turn_(
-    char _c_, bool _s_
+    _GAME_* _game_, char _c_, bool _s_
 ) {
-    bool _b_ = !(_game_._flag_._turn_) ? (_c_ == 'W' || _c_ == 'Q') : (_c_ == 'B' || _c_ == 'K');
+    bool _b_ = !(_game_->_flag_._turn_) ? (_c_ == 'W' || _c_ == 'Q') : (_c_ == 'B' || _c_ == 'K');
 
     if (_s_ && _b_) {
-        _game_._flag_._turn_ = !_game_._flag_._turn_;
+        _game_->_flag_._turn_ = !_game_->_flag_._turn_;
     }
 
     return(_b_);
@@ -167,120 +61,44 @@ bool _game_turn_(
 
 
 //! allocate memory and initialize attributes
-bool _game_create_(void) {
-    _game_._flag_i_ = _act_._flag_i_;
-
-    const uint8_t
-        _w_ = _act_._board_w_,
-        _h_ = _act_._board_h_;
-
-    _game_._board_w_ = _w_, _game_._board_h_ = _h_;
-
-    const size_t
-        _size_ = _game_._board_w_ * _game_._board_h_;
-
-    _game_._board_data_ = calloc(
-        _size_, sizeof(char)
-    );
-
-    memset(
-        _game_._board_data_, '.', _size_
-    );
-
-
-
-    return(
-        _game_._board_data_ != NULL
-    );
-}
-
-//! free allocated memory
-bool _game_destroy_(void) {
-    _game_._flag_i_ = _game_._board_w_ = _game_._board_h_ = 0x0;
-
-    bool _b_ = 0x0;
-
-    if (
-        _game_._board_data_ != NULL
-    ) {
-        free(
-            _game_._board_data_
-        ); _game_._board_data_ = NULL;
-
-        _game_ = (_GAME_){};
-
-        _b_ = true;
-    } else {
-        _b_ = false;
-    }
-
-    return(_b_);
-}
-
-//! initialize a new game
-bool _game_init_(void) {
-    bool _b_ = 0x0;
-
-    if (
-        _game_._board_data_ != NULL && _act_._board_data_ != NULL
-    )
-    {
-        _game_._flag_i_ = _act_._flag_i_;
-
-        const size_t
-            _size_ = _act_._board_w_ * _act_._board_h_;
-
-        memcpy(
-            _game_._board_data_, _act_._board_data_, _size_
-        );
-
-        _b_ = true;
-    } else {
-        _b_ = false;
-    }
-
-    return(_b_);
-}
-
-
-
-bool _act_create_(
-    uint8_t _w_, uint8_t _h_, const char* _data_
+bool _game_create_(
+    _GAME_* _game_, uint8_t _w_, uint8_t _h_, const char* _data_
 )
 {
-    _act_._board_w_ = _w_, _act_._board_h_ = _h_;
-
     const size_t
-        _size_ = _act_._board_w_ * _act_._board_h_;
+        _size_ = _w_ * _h_;
 
-    _act_._board_data_ = calloc(
+
+
+    _game_->_board_._w_ = _w_, _game_->_board_._h_ = _h_;
+
+    _game_->_board_._data_ = calloc(
         _size_, sizeof(char)
     );
 
     memcpy(
-        _act_._board_data_, _data_, _size_
+        _game_->_board_._data_, _data_, _size_
     );
 
 
 
     return(
-        _act_._board_data_ != NULL
+        _game_->_board_._data_ != NULL
     );
 }
 
-bool _act_destroy_(void) {
-    _act_._board_w_ = _act_._board_h_ = 0x0;
-
+//! free allocated memory
+bool _game_destroy_(_GAME_* _game_) {
     bool _b_ = 0x0;
 
     if (
-        _act_._board_data_ != NULL
+        _game_->_board_._data_ != NULL
     ) {
         free(
-            _act_._board_data_
-        ); _act_._board_data_ = NULL;
+            _game_->_board_._data_
+        ); _game_->_board_._data_ = NULL;
 
-        _act_ = (_GAME_){};
+        *(_game_) = (_GAME_){};
 
         _b_ = true;
     } else {

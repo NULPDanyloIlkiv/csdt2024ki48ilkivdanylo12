@@ -17,9 +17,9 @@
 
 //! a message -> [key + data]
 enum _eKey_ {
-    _kERROR_ = 0x0, _kINIT_ = 0x1, _kTURN_ = 0x2, _kSTEP_MAKE_OLD_ = 0x3, _kSTEP_MAKE_NEW_ = 0x4, _kSTEP_BOT_ = 0x5, _kSTEP_TAKE_ = 0x6, _kUPDATE_ = 0x7,
+    _kERROR_ = 0x0, _kINIT_ = 0x1, _kTURN_ = 0x2, _kSTEP_MAKE_ = 0x3, _kSTEP_BOT_ = 0x4, _kSTEP_TAKE_ = 0x5, _kUPDATE_ = 0x6,
 
-    _kMESSAGE_ = 0x8, _kRESTART_ = 0x9, _kSIZE_
+    _kMESSAGE_ = 0x7, _kRESTART_ = 0x8
 };
 
 typedef uint8_t _KEY_;
@@ -54,6 +54,28 @@ static char* const _gDATA_ = "W.Q.W.W."
                              ".B.K.B.B"
                              "B.B.B.B."
                              ".B.B.K.B";
+
+
+
+struct _sBoard_ {
+    uint8_t _w_, _h_; char* _data_;
+};
+
+typedef struct _sBoard_ _BOARD_;
+
+bool _is_inside_board_(
+    _BOARD_ _board_, int x, int y
+);
+
+char _get_board_char_(
+    _BOARD_ _board_, uint8_t x, uint8_t y
+);
+
+char _set_board_char_(
+    _BOARD_ _board_, uint8_t x, uint8_t y, char _new_
+);
+
+
 
 struct _sData_ {
     size_t _cnt_; void* _data_;

@@ -250,18 +250,19 @@ LRESULT _cEngine_::HandleMessage(UINT _In_ uMsg,
             if (select) {
                 select = nullptr;
             }
-
+#ifdef _COM_PORT_
             client->_game_restart_();
-
+#endif // _COM_PORT_
             _update_ = true;
 
         } break;
 
         case(VK_TAB): {
+#ifdef _COM_PORT_
             client->_step_bot_();
 
             client->_step_take_();
-
+#endif // _COM_PORT_
             _update_ = true;
         } break;
 
@@ -297,7 +298,7 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
      */
 
     if (m_bRMK) {
-        const float _fPAN_SPEED_ = 5.f;
+        const float _fPAN_SPEED_ = 3.f;
 
         camera.vOffset -= vec2f { _fPAN_SPEED_ } * (
             _vMOUSE_ - m_vecPan
@@ -328,8 +329,6 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
             _fCURSOR_.y, 0.f, _data_.m_nMapH - 0.01f
         );
 
-        size_t _size_ = _data_.m_vecData.size();
-
         for (auto& o: _data_.m_vecData) {
             if (
                 !(o.cType != '.')
@@ -341,11 +340,6 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
             {
                 if (!select) {
                     select = &o; select->vOldPos = select->vNewPos;
-#ifdef _COM_PORT_
-                    client->_step_make_(
-                        _kSTEP_MAKE_OLD_, { int(select->vOldPos.x), int(select->vOldPos.y) }
-                    );
-#endif // _COM_PORT_
                 } break;
             }
         }
@@ -356,7 +350,10 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
     } else if (select != nullptr) {
 #ifdef _COM_PORT_
         client->_step_make_(
-            _kSTEP_MAKE_NEW_, { int(select->vNewPos.x), int(select->vNewPos.y) }
+            {
+                { int(select->vOldPos.x), int(select->vOldPos.y) },
+                { int(select->vNewPos.x), int(select->vNewPos.y) }
+            }
         );
 
         client->_step_take_();
@@ -441,7 +438,7 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
 
     //! update a window
     (void)InvalidateRect(
-        m_hWnd, NULL, NULL
+        m_hWnd, NULL, 0x0
     );
 
     return(0x1);
@@ -451,10 +448,13 @@ bool _cEngine_::_DoWork_(float fElapsedTime) {
 
 //! update a data to current one
 bool _cEngine_::_UpdateData_(void) {
+#ifdef _COM_PORT_
+    client->_update_();
+
     _data_ = {
         client->_map_w_(), client->_map_h_(), client->_data_()
     };
-
+#endif // _COM_PORT_
     return(0x1);
 }
 
@@ -569,7 +569,10 @@ void _cEngine_::_DrawFrame_(void) {
 
             glLineWidth(0x3);
             _Draw_Polygon_(
-                { { x, 0x0 }, { x, _data_.m_nMapH }, { 0x0, y }, { _data_.m_nMapW, y } }, GL_LINES
+                {
+                    { float(x), 0x0 }, { float(x), float(_data_.m_nMapH) },
+                    { 0x0, float(y) }, { float(_data_.m_nMapW), float(y) }
+                }, GL_LINES
             );
 
         glPopMatrix();
@@ -606,8 +609,8 @@ void _cEngine_::_DrawFrame_(void) {
             glLineWidth(0x3);
             _Draw_Polygon_(
                 {
-                    { _iCURSOR_.x, _iCURSOR_.y }, { _iCURSOR_.x + 0x1, _iCURSOR_.y },
-                    { _iCURSOR_.x + 0x1, _iCURSOR_.y + 0x1 }, { _iCURSOR_.x, _iCURSOR_.y + 0x1 }
+                    { float(_iCURSOR_.x), float(_iCURSOR_.y) }, { float(_iCURSOR_.x + 0x1), float(_iCURSOR_.y) },
+                    { float(_iCURSOR_.x + 0x1), float(_iCURSOR_.y + 0x1) }, { float(_iCURSOR_.x), float(_iCURSOR_.y + 0x1) }
                 }, GL_LINE_LOOP
             );
 

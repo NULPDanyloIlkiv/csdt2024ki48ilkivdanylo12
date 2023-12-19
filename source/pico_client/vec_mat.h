@@ -74,8 +74,6 @@ struct vec2f {
 	bool operator!=(vec2f const& vec);
 };
 
-
-
 struct vec3f;
 
 struct vec3f {

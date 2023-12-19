@@ -2,6 +2,7 @@
 #define _OPENGL_H_
 
 #include <windows.h>
+
 #include <gl/gl.h>
 #include <gl/glu.h>
 

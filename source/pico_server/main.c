@@ -6,6 +6,7 @@
 const int _gLED_PIN_ = PICO_DEFAULT_LED_PIN;
 
 #include "server.h"
+
 #include "game.h"
 
 #include "data.h"
@@ -47,13 +48,15 @@ int main() {
     while(_state_) {
         _state_ = true;
 
-        _state_ &= _act_create_(
-            _gSIZE_W_, _gSIZE_H_, _gDATA_
+        _GAME_ _game_ = {};
+
+        _state_ &= _game_create_(
+            &_game_, _gSIZE_W_, _gSIZE_H_, _gDATA_
         );
 
-        _state_ &= _server_loop_();
+        _state_ &= _server_loop_(&_game_);
 
-        _state_ &= _act_destroy_();
+        _state_ &= _game_destroy_(&_game_);
     }
 
 

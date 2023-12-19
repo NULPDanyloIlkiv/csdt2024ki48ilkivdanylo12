@@ -16,9 +16,6 @@
  * @brief engine.h
  */
 
-static const int nWindowWidth = 640;
-static const int nWindowHeight = 640;
-
 /**
  * @brief the engine class
  *
