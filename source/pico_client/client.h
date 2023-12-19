@@ -50,14 +50,17 @@ public:
 
     //! send a message that stores [key + data] indicating the execution of a player move
     void _step_make_(
-        _KEY_ _key_, _POINT_ _point_
+        _STEP_ _step_
     );
 
     //! send a message that stores a [key + data] indicating the execution of a bot move
     void _step_bot_(void);
 
-    //! recv a message that stores a [key + data] indicating a result of a player / bot move | update a map and objects
+    //! recv a message that stores a [key + data] indicating a result of a player / bot move
     void _step_take_(void);
+
+    //! update a map and objects
+    void _update_(void);
 
     void _game_restart_(void);
 #endif // _COM_PORT_

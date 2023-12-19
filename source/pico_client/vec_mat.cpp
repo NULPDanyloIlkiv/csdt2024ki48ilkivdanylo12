@@ -1,4 +1,4 @@
-#include "vec2.h"
+#include "vec_mat.h"
 
 /**
  * @file

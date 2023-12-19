@@ -2,6 +2,9 @@
 
 #include <cassert>
 
+static const int nWindowWidth = 640;
+static const int nWindowHeight = 640;
+
 /**
  * @file
  *

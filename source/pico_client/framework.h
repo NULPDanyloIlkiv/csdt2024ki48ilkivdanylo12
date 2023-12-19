@@ -25,9 +25,6 @@
 #include <windowsx.h>
 
 #include <winbase.h>
-
-#include <shellapi.h>
-#pragma comment(lib, "winmm.lib")
 // Файлы заголовков среды выполнения C
 #include <stdlib.h>
 #include <malloc.h>

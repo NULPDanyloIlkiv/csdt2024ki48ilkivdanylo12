@@ -3,6 +3,8 @@
 
 #include "framework.h"
 
+#include "game.h"
+
 #include "data.h"
 
 /**
@@ -12,7 +14,7 @@
  */
 
 bool _bot_step_(
-    bool _turn_, _POINT_* _old_, _POINT_* _new_
+    _GAME_* _game_, bool _turn_, _POINT_* _old_, _POINT_* _new_
 );
 
 #endif // _BOT_H_

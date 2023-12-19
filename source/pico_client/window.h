@@ -35,7 +35,7 @@ public:
 		HICON hIcon = LoadIcon(GetModuleHandle(NULL), IDI_APPLICATION),
 		HICON hIconSm = LoadIcon(GetModuleHandle(NULL), IDI_APPLICATION),
 		LPCWSTR lpszMenuName = NULL,
-		int cbClsExtra = NULL, int cbWndExtra = NULL
+		int cbClsExtra = 0x0, int cbWndExtra = 0x0
 	);
 	BOOL CreateW(
 		LPWSTR lpszWindowName = NULL,
@@ -53,7 +53,7 @@ protected:
         UINT _In_ uMsg, WPARAM _In_ wParam, LPARAM _In_ lParam
     ) = 0;
 
-	DWORD m_nCmdShow = NULL;
+	DWORD m_nCmdShow = 0x0;
 
 	HINSTANCE m_hInstance;
 

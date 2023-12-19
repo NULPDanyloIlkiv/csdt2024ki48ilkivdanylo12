@@ -15,86 +15,52 @@ enum _eFlag_ {
     _fTURN_ = 0b0001, _fCOMBO_ = 0b0010
 };
 
-char* _get_board_data_();
+//! structure that store information about the game
+struct _sGame_ {
+    _BOARD_ _board_;
 
-char _get_board_char_(
-    int8_t x, int8_t y
-);
+    union {
+        struct _sFlag_ {
+            bool _turn_ : 1; bool _combo_ : 1;
+        } _flag_;
 
-char _set_board_char_(
-    int8_t x, int8_t y, char _new_
-);
+        int8_t _flag_i_;
+    };
 
-int _get_board_w_(void);
+    _STEP_ _mem_;
+};
 
-int _get_board_h_(void);
-
-
-
-//! get a flag
-int8_t _get_flag_(void);
-
-//! set a flag
-int8_t _set_flag_(
-    int8_t _flag_
-);
+typedef struct _sGame_ _GAME_;
 
 
-
-//! get a mem-step
-_STEP_ _get_mem_(void);
-
-//! set a mem-step
-_STEP_ _set_mem_(
-    _STEP_ _step_
-);
-
-
-
-bool _is_inside_board_(
-    int x, int y
-);
 
 //! make a step on a board
 void _game_step_(
-    _STEP_ _step_
+    _GAME_* _game_, _STEP_ _step_
 );
 
 //! make a mortal man queen or king
 bool _game_q_or_k_(
-    _POINT_ _point_, bool _s_
+    _GAME_* _game_, _POINT_ _point_, bool _s_
 );
-
-//! a direction of move | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
-int8_t _game_set_move_(char _c_);
-
-//! a direction of jump | 0x0 - ALL | +0x1 - UP | -0x1 - DOWN
-int8_t _game_set_jump_(char _c_);
 
 
 
 //! turn to make a step
 bool _game_turn_(
-    char _c_, bool _s_
+    _GAME_* _game_, char _c_, bool _s_
 );
 
 
 
 //! allocate memory and initialize attributes
-bool _game_create_(void);
-
-//! free allocated memory
-bool _game_destroy_(void);
-
-//! initialize a new game
-bool _game_init_(void);
-
-
-
-bool _act_create_(
-    uint8_t _w_, uint8_t _h_, const char* _data_
+bool _game_create_(
+    _GAME_* _game_, uint8_t _w_, uint8_t _h_, const char* _data_
 );
 
-bool _act_destroy_(void);
+//! free allocated memory
+bool _game_destroy_(
+    _GAME_* _game_
+);
 
 #endif // _GAME_H_
