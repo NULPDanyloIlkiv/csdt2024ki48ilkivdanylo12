@@ -31,9 +31,11 @@ struct _sGame_ {
 
 
 //! make a step on a board
-void _game_step_(
+void _game_step_make_(
     _GAME_* _game_, _STEP_ _step_
 );
+
+
 
 //! make a mortal man queen or king
 bool _game_q_or_k_(
@@ -45,6 +47,13 @@ bool _game_q_or_k_(
 //! turn to make a step
 bool _game_turn_(
     _GAME_* _game_, char _c_, bool _s_
+);
+
+
+
+//! cancel a update on a board
+void _game_update_cancel_(
+    _GAME_* _game_, _UPDATE_ _update_
 );
 
 

@@ -529,7 +529,7 @@ bool _logic_step_(
                 }
 
                 //! make a step on a board
-                _game_step_(
+                _game_step_make_(
                     _game_, (_STEP_){ _p_old_, _p_new_ }
                 );
 
@@ -560,8 +560,11 @@ bool _logic_step_(
                 if (
                     _game_q_or_k_(_game_, _p_new_, true)
                 ) {
-                    _c_jump_ = _get_board_char_(
-                        _game_->_board_, _p_new_.x, _p_new_.y
+                    //! update a checker on a board
+                    (void)_update_add_(_update_,
+                        (_CHECKER_){ _p_old_, _c_ }, (_CHECKER_){
+                            _p_new_, _c_jump_ = _get_board_char_(_game_->_board_, _p_new_.x, _p_new_.y)
+                        }
                     );
                 }
 
@@ -603,7 +606,7 @@ bool _logic_step_(
                 ((bool**)(_mask_move_._data_))[_p_new_.x][_p_new_.y]
             ) {
                 //! make a step on a board
-                _game_step_(
+                _game_step_make_(
                     _game_, (_STEP_){ _p_old_, _p_new_ }
                 );
 
@@ -611,8 +614,11 @@ bool _logic_step_(
                 if (
                     _game_q_or_k_(_game_, _p_new_, true)
                 ) {
-                    _c_move_ = _get_board_char_(
-                        _game_->_board_, _p_new_.x, _p_new_.y
+                    //! update a checker on a board
+                    (void)_update_add_(_update_,
+                        (_CHECKER_){ _p_old_, _c_ }, (_CHECKER_){
+                            _p_new_, _c_move_ = _get_board_char_(_game_->_board_, _p_new_.x, _p_new_.y)
+                        }
                     );
                 }
 

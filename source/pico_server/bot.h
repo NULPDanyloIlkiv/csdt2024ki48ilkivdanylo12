@@ -14,7 +14,7 @@
  */
 
 bool _bot_step_(
-    _GAME_* _game_, bool _turn_, _POINT_* _old_, _POINT_* _new_
+    _GAME_* _game_, bool _turn_, _POINT_* _p_old_, _POINT_* _p_new_
 );
 
 #endif // _BOT_H_

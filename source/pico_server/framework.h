@@ -9,12 +9,14 @@
  * a set of header (.h) files using in the project
  */
 
-#include <math.h>
-
 #include <string.h>
 
 #include <stdio.h>
 #include "pico/stdio.h"
+
+#include <math.h>
+
+#include <limits.h>
 
 #include <stdlib.h>
 #include "pico/stdlib.h"
