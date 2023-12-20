@@ -37,9 +37,9 @@ struct _sStep_ {
     _POINT_ _old_, _new_;
 }; typedef _sStep_ _STEP_;
 
-//! structure indicating a checker to be updated on a board | [x y] -> c
+//! structure that indicating a checker to be updated on a board | [x y] -> c
 struct _sUpdate_ {
-    _POINT_ _id_; char _c_;
+    struct { _POINT_ _id_; char _c_; } _old_, _new_;
 }; typedef _sUpdate_ _UPDATE_;
 
 #endif // _DATA_H_

@@ -7,8 +7,6 @@
 
 #include "bot.h"
 
-#include "update.h"
-
 /**
  * @file
  *
@@ -144,14 +142,14 @@ static bool _server_request_step_bot_(_GAME_* _game_) {
     return(true);
 }
 
-
+static _DATA_ _update_ = {};
 
 //! make a move and check the result of a move
 static bool _server_request_step_take_(_GAME_* _game_) {
     _STEP_ _step_ = {};
 
     if (
-        _logic_step_(_game_, _old_, _new_, &_step_)
+        _logic_step_(_game_, _old_, _new_, &_step_, &_update_)
     ) {
         /*Code...*/
     } else {
@@ -174,15 +172,20 @@ static bool _server_request_step_take_(_GAME_* _game_) {
 
 //! update a state of checkers on a board
 bool _server_request_update_(_GAME_* _game_) {
+    (void)_com_send_data_(
+        _kUPDATE_, &_update_._cnt_, 0x1, sizeof(_update_._cnt_)
+    );
+
     if (
-        !_update_send_()
-    ) {
-        (void)_com_send_message_(
-            "__ERROR__ - Failed to send _update_"
-        ); return(0x0);
+        _update_._data_ != NULL
+    )
+    {
+        (void)_com_send_(
+           _update_._data_, _update_._cnt_, sizeof(_UPDATE_)
+        );
     }
 
-    (void)_update_clear_();
+    (void)_data_clear_(&_update_);
 
     return(true);
 }

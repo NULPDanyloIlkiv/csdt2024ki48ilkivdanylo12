@@ -124,7 +124,7 @@ void _cClient_::_game_init_(void) {
 
     (void)_handle_key_data_(_kINIT_, [&](void)
     {
-        _INIT_ _init_ = { 0x0, 0x0 };
+        _INIT_ _init_ = {};
 
         size_t _bytes_recv_ = 0x0;
 
@@ -237,9 +237,7 @@ void _cClient_::_step_bot_(void) {
 
     (void)_handle_key_data_(_kSTEP_BOT_, [&](void)
         {
-            _STEP_ _s_ = {
-                { 0x0 }, { 0x0 }
-            };
+            _STEP_ _s_ = {};
 
             size_t _bytes_recv_ = 0x0;
 
@@ -266,9 +264,7 @@ void _cClient_::_step_take_(void) {
 
     (void)_handle_key_data_(_kSTEP_TAKE_, [&](void)
     {
-        _STEP_ _s_ = {
-            { 0x0 }, { 0x0 }
-        };
+        _STEP_ _s_ = {};
 
         size_t _bytes_recv_ = 0x0;
 
@@ -280,6 +276,7 @@ void _cClient_::_step_take_(void) {
             _bytes_recv_, _s_._old_.x, _s_._old_.y, _s_._new_.x, _s_._new_.y
         );
 
+        /*
         for(auto& _o_ : m_vecObjects)
             if (
                 _o_.cType != '.' && _s_._old_.x == int(_o_.vOldPos.x) && _s_._old_.y == int(_o_.vOldPos.y)
@@ -289,6 +286,7 @@ void _cClient_::_step_take_(void) {
                     _s_._new_.x + 0.5f, _s_._new_.y + 0.5f
                 }; _o_.vOldPos = _o_.vNewPos; break;
             }
+        */
     }
     );
 }
@@ -317,21 +315,19 @@ void _cClient_::_update_(void) {
             size_t i = 0x0; i < _cnt_; i += 0x1
         )
         {
-            _UPDATE_ _update_ = {
-                { -0x1, -0x1 }, 0x0
-            };
+            _UPDATE_ _update_ = {};
 
             _bytes_recv_ += _com_recv_(
                 &m_sp, &_update_, 0x1, sizeof(_update_)
             );
 
-            auto it = std::transform(
+            (void)std::transform(
                 m_vecObjects.cbegin(), m_vecObjects.cend(), m_vecObjects.begin(), [&](const _sObject_& o)
                 {
                     _sObject_ _o_ = o;
 
                     if (
-                        _update_._id_.x == int(_o_.vNewPos.x) && _update_._id_.y == int(_o_.vNewPos.y)
+                        _update_._old_._c_ == _o_.cType && _update_._old_._id_.x == int(_o_.vNewPos.x) && _update_._old_._id_.y == int(_o_.vNewPos.y)
                     )
                     {
                         if (
@@ -344,7 +340,13 @@ void _cClient_::_update_(void) {
                             );
                         }
 
-                        _o_.cType = _update_._c_;
+                        _o_.vOldPos = _o_.vNewPos;
+
+                        _o_.vNewPos = {
+                            _update_._new_._id_.x + 0.5f, _update_._new_._id_.y + 0.5f
+                        };
+
+                        _o_.cType = _update_._new_._c_;
                     }
 
                     return(_o_);

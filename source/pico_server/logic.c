@@ -46,6 +46,64 @@ void* _logic_all_(
     return(_data_);
 }
 
+void* _logic_add_move_(
+    void* _data_, _GAME_* _game_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
+) {
+    _DATA_* _move_ = (_DATA_*)_data_;
+
+    if (
+        _is_inside_board_(_game_->_board_, _p_.x, _p_.y)
+    ) {
+        if (
+            _logic_is_move_one_(_game_, _id_, _c_, _p_)
+        ) {
+            _data_add_(_move_, sizeof(_STEP_));
+
+            _STEP_* _step_ = (_STEP_*)_move_->_data_;
+
+            _step_[
+                _move_->_cnt_ - 0x1
+            ] = (_STEP_){ _id_, _p_ };
+        }
+    }
+
+    return(_data_);
+}
+
+void* _logic_add_jump_(
+    void* _data_, _GAME_* _game_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
+) {
+    void* _res_ = _data_;
+    if (!_res_) { return(_res_); }
+
+    bool _combo_ = 0x0;
+
+    if (
+        _game_->_flag_i_ & _fCOMBO_
+    ) {
+        _STEP_ _mem_ = _game_->_mem_;
+
+        _combo_ = (_id_.x == _mem_._new_.x) && (_id_.y == _mem_._new_.y);
+    }
+
+    _DATA_* _jump_ = (_DATA_*)_data_;
+
+    if (
+        _logic_is_jump_one_(_game_, _id_, _c_, _p_)
+    ) {
+        _data_add_(_jump_, sizeof(_STEP_));
+
+        _STEP_* _step_ = (_STEP_*)_jump_->_data_;
+        _step_[_jump_->_cnt_ - 0x1] = (_STEP_){
+            _id_, (_POINT_){ _p_.x + x, _p_.y + y}
+        };
+
+        if (_combo_) { _res_ = NULL; }
+    }
+
+    return(_res_);
+}
+
 
 
 _MASK_ _logic_create_mask_(
@@ -304,7 +362,36 @@ bool _logic_is_jump_at_least_all_(
 
 
 
-#include "update.h"
+bool _logic_find_checker_all_(
+    void* _data_, _GAME_* _game_, bool _turn_
+) {
+    _DATA_* _checker_ = (_DATA_*)_data_;
+
+    for (int8_t y = 0x0; y < _game_->_board_._h_; y += 0x1)
+    for (int8_t x = 0x0; x < _game_->_board_._w_; x += 0x1)
+    {
+        char _c_ = _get_board_char_(
+            _game_->_board_, x, y
+        );
+
+        if (
+            !(_turn_) ? (_c_ != 'W' && _c_ != 'Q') : (_c_ != 'B' && _c_ != 'K')
+        ) { continue; }
+
+        (void)_data_add_(
+            _checker_, sizeof(_CHECKER_)
+        );
+
+        _CHECKER_* _ch_ = (_CHECKER_*)_checker_->_data_;
+        _ch_[_checker_->_cnt_ - 0x1] = (_CHECKER_){ x, y, _c_};
+    }
+
+    return(
+        _checker_->_cnt_ != 0x0
+    );
+}
+
+
 
 static _MASK_
     _mask_move_ = {};
@@ -370,131 +457,191 @@ bool _logic_destroy_(_GAME_* _game_) {
     return(_b_);
 }
 
-bool _logic_step_(
-    _GAME_* _game_, _POINT_ _old_, _POINT_ _new_, _STEP_* _step_
-) {
-    if (
-        _get_board_char_(
-            _game_->_board_, _old_.x, _old_.y
-        ) == '.'
-    ) { return(0x0); }
+#include "update.h"
 
+/**
+ * @brief a function that implements the logic and rules of the game. this function is the most important function available on the server
+ *
+ * as a parameter, the function takes the coordinates of cells A and B.
+ * a cell A is a cell on which a checker standing. a cell B is a cell on which you need to move a checker.
+ */
+bool _logic_step_(
+    _GAME_* _game_, _POINT_ _p_old_, _POINT_ _p_new_, _STEP_* _step_, _DATA_* _update_
+) {
+    //! get a type of a checker located in coordinates x | y
+    char _c_ = _get_board_char_(
+        _game_->_board_, _p_old_.x, _p_old_.y
+    );
+
+    //! if a data is correct
     if (
-        _mask_move_._data_ != NULL && _mask_jump_._data_ != NULL
+        _c_ != '.' && _mask_move_._data_ != NULL && _mask_jump_._data_ != NULL
     )
     {
-        char _c_ = _get_board_char_(
-            _game_->_board_, _old_.x, _old_.y
-        );
+        /**
+         * @brief if it's my turn now...
+         */
 
         if (
             !_game_turn_(_game_, _c_, 0x0)
         ) {
-            _new_ = _old_;
+            _p_new_ = _p_old_;
 
+            //! else error...
             goto linkExit;
         }
+
+
+
+        char _c_jump_ = _c_;
+
+        /**
+         * @brief create a matrix of available jumps
+         */
 
         _mask_jump_ = _logic_clear_jump_(_mask_jump_);
 
         _mask_jump_ = _logic_find_jump_all_(
-            _mask_jump_, _game_, _old_, _c_
+            _mask_jump_, _game_, _p_old_, _c_jump_
         );
 
-        if (_mask_jump_._cnt_ != 0x0) {
+        if (
+            //! if there is at least one jump - make a jump
+            _mask_jump_._cnt_ != 0x0
+        ) {
+            //! if a move made is one of possible jumps
             if (
-                ((_POINT_***)(_mask_jump_._data_))[_new_.x][_new_.y] != NULL
+                ((_POINT_***)(_mask_jump_._data_))[_p_new_.x][_p_new_.y] != NULL
             ) {
+                //! if a checker has made a jump and can make another jump
                 if (_game_->_flag_i_ & _fCOMBO_) {
                     _STEP_ _mem_ = _game_->_mem_;
 
+                    //! check it's a same checker
                     if (
-                        !(_old_.x == _mem_._new_.x && _old_.y == _mem_._new_.y)
+                        !(_p_old_.x == _mem_._new_.x && _p_old_.y == _mem_._new_.y)
                     ) {
-                        _new_ = _old_;
+                        _p_new_ = _p_old_;
 
+                        //! else error...
                         goto linkExit;
                     }
                 }
 
+                //! make a step on a board
                 _game_step_(
-                    _game_, (_STEP_){ _old_, _new_ }
+                    _game_, (_STEP_){ _p_old_, _p_new_ }
                 );
 
-                _POINT_* _jump_ = ((_POINT_***)(_mask_jump_._data_))
-                    [_new_.x][_new_.y];
 
-                _POINT_ _j_ = *(_jump_);
 
-                _set_board_char_(
-                    _game_->_board_, _j_.x, _j_.y, '.'
+                /**
+                 * @brief update a checker that was taken
+                 */
+
+                _POINT_* _jump_ = (
+                    (_POINT_***)(_mask_jump_._data_)
+                )[_p_new_.x][_p_new_.y];
+
+                _POINT_ _target_ = *(_jump_);
+
+                char _c_old_ = '\0', _c_new_ = '.';
+                _c_old_ = _set_board_char_(
+                    _game_->_board_, _target_.x, _target_.y, _c_new_
                 );
 
-                (void)_update_add_(_j_, '.');
+                (void)_update_add_(_update_,
+                    (_CHECKER_){ _target_, _c_old_ }, (_CHECKER_){ _target_, _c_new_ }
+                );
 
 
 
+                //! if a checker became Q or K
                 if (
-                    _game_q_or_k_(_game_, _new_, true)
+                    _game_q_or_k_(_game_, _p_new_, true)
                 ) {
-                    _c_ = _get_board_char_(
-                        _game_->_board_, _new_.x, _new_.y
+                    _c_jump_ = _get_board_char_(
+                        _game_->_board_, _p_new_.x, _p_new_.y
                     );
                 }
 
+                /**
+                 * @brief if a checker has made a jump and can make another jump
+                 */
+
                 bool _b_ = _logic_is_jump_all_(
-                    _game_, _new_, _c_
+                    _game_, _p_new_, _c_jump_
                 );
 
                 int8_t _f_ = _game_->_flag_i_;
                 _b_ ? (_f_ |= _fCOMBO_) : (_f_ &= ~(_fCOMBO_));
                 _game_->_flag_i_ = _f_;
 
-                (void)_game_turn_(_game_, _c_, !_b_);
+                //! turn a move
+                (void)_game_turn_(_game_, _c_jump_, !_b_);
             } else {
-                _new_ = _old_; goto linkExit;
+                _p_new_ = _p_old_; goto linkExit;
             }
         } else if (
+            //! if there is no one jump - make a move
             !_logic_is_jump_at_least_all_(_game_, _game_->_flag_i_ & _fTURN_)
         ) {
+            char _c_move_ = _c_;
+
+            /**
+            * @brief create a matrix of available moves
+            */
+
             _mask_move_ = _logic_clear_move_(_mask_move_);
 
             _mask_move_ = _logic_find_move_all_(
-                _mask_move_, _game_, _old_, _c_
+                _mask_move_, _game_, _p_old_, _c_move_
             );
 
+            //! if a move made is one of possible moves
             if (
-                ((bool**)(_mask_move_._data_))[_new_.x][_new_.y]
+                ((bool**)(_mask_move_._data_))[_p_new_.x][_p_new_.y]
             ) {
+                //! make a step on a board
                 _game_step_(
-                    _game_, (_STEP_){ _old_, _new_ }
+                    _game_, (_STEP_){ _p_old_, _p_new_ }
                 );
 
-                (void)_game_turn_(_game_, _c_, true);
+                //! if a checker became Q or K
+                if (
+                    _game_q_or_k_(_game_, _p_new_, true)
+                ) {
+                    _c_move_ = _get_board_char_(
+                        _game_->_board_, _p_new_.x, _p_new_.y
+                    );
+                }
+
+                //! turn a move
+                (void)_game_turn_(_game_, _c_move_, true);
             } else {
-                _new_ = _old_; goto linkExit;
+                _p_new_ = _p_old_; goto linkExit;
             }
         } else {
-            _new_ = _old_; goto linkExit;
+            //! else error...
+            _p_new_ = _p_old_; goto linkExit;
         }
     } else {
+        //! else error...
         return(0x0);
     }
 
-    if (
-        _game_q_or_k_(_game_, _new_, true)
-    )
-    {
-        (void)_update_add_(
-            _new_, _get_board_char_(_game_->_board_, _new_.x, _new_.y)
-        );
-    }
-
-    _game_->_mem_ = (_STEP_){ _old_, _new_ };
+    //! memorize a step that was made
+    _game_->_mem_ = (_STEP_){ _p_old_, _p_new_ };
 
 linkExit:
+    //! update a checker on a board
+    (void)_update_add_(_update_,
+        (_CHECKER_){ _p_old_, _c_ }, (_CHECKER_){ _p_new_, _get_board_char_(_game_->_board_, _p_new_.x, _p_new_.y) }
+    );
+
+    //! return a step
     *(_step_) = (_STEP_){
-        _old_, _new_
+        _p_old_, _p_new_
     };
 
     return(true);
