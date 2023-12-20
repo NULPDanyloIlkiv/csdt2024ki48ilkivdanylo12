@@ -12,11 +12,11 @@
  */
 
 size_t _update_add_(
-    _POINT_ _point_, char _c_
+    _DATA_* _data_, _CHECKER_ _ch_old_, _CHECKER_ _ch_new_
 );
 
-size_t _update_clear_(void);
-
-size_t _update_send_(void);
+size_t _update_clear_(
+	_DATA_* _data_
+);
 
 #endif // _UPDATE_H_

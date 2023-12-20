@@ -46,22 +46,21 @@ static size_t const _gSIZE_W_ = 0x8;
 static size_t const _gSIZE_H_ = 0x8;
 
 //! board data N x N
-static char* const _gDATA_ = "W.Q.W.W."
+static char* const _gDATA_ = "W.W.W.W."
                              ".W.W.W.W"
-                             "W.W.Q.W."
+                             "W.W.W.W."
                              "........"
                              "........"
-                             ".B.K.B.B"
+                             ".B.B.B.B"
                              "B.B.B.B."
-                             ".B.B.K.B";
+                             ".B.B.B.B";
 
 
 
+//! structure that stores a board data
 struct _sBoard_ {
     uint8_t _w_, _h_; char* _data_;
-};
-
-typedef struct _sBoard_ _BOARD_;
+}; typedef struct _sBoard_ _BOARD_;
 
 bool _is_inside_board_(
     _BOARD_ _board_, int x, int y
@@ -74,6 +73,20 @@ char _get_board_char_(
 char _set_board_char_(
     _BOARD_ _board_, uint8_t x, uint8_t y, char _new_
 );
+
+
+
+//! structure that stores a checker data
+struct _sChecker_ {
+    _POINT_ _id_; char _c_;
+}; typedef struct _sChecker_ _CHECKER_;
+
+
+
+//! structure that indicating a checker to be updated on a board | [x y] -> c
+struct _sUpdate_ {
+    _CHECKER_ _old_, _new_;
+}; typedef struct _sUpdate_ _UPDATE_;
 
 
 

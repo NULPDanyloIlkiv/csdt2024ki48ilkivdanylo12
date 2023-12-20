@@ -1,60 +1,30 @@
 #include "update.h"
 
-#include "serial_port.h"
-
 /**
  * @file
  *
  * @brief update.c
  */
 
-//! structure indicating a checker to be updated on a board | [x y] -> c
-struct _sUpdate_ {
-    _POINT_ _id_; char _c_;
-}; typedef struct _sUpdate_ _UPDATE_;
-
-static _DATA_ _update_ = {};
-
-
-
 size_t _update_add_(
-    _POINT_ _point_, char _c_
+    _DATA_* _data_, _CHECKER_ _ch_old_, _CHECKER_ _ch_new_
 )
 {
     (void)_data_add_(
-        &_update_, sizeof(_UPDATE_)
+        _data_, sizeof(_UPDATE_)
     );
 
-    _UPDATE_* _data_ = (_UPDATE_*)_update_._data_;
+    _UPDATE_* _update_ = (_UPDATE_*)_data_->_data_;
 
-    _data_[
-        _update_._cnt_ - 0x1
-    ] = (_UPDATE_){ _point_, _c_ };
+    _update_[
+        _data_->_cnt_ - 0x1
+    ] = (_UPDATE_){ _ch_old_, _ch_new_ };
 
-    return(_update_._cnt_);
+    return(_data_->_cnt_);
 }
 
-size_t _update_clear_(void) {
+size_t _update_clear_(_DATA_* _data_) {
     return(
-        _data_clear_(&_update_)
+        _data_clear_(_data_)
     );
-}
-
-size_t _update_send_(void) {
-    size_t _size_ = 0x0;
-
-    _size_ += _com_send_data_(
-        _kUPDATE_, &_update_._cnt_, 0x1, sizeof(_update_._cnt_)
-    );
-
-    if (
-        _update_._data_ != NULL
-    )
-    {
-        _size_ += _com_send_(
-           _update_._data_, _update_._cnt_, sizeof(_UPDATE_)
-        );
-    }
-
-    return(_size_);
 }

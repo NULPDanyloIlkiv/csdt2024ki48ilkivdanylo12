@@ -22,6 +22,16 @@ void* _logic_all_(
     void* _data_, _GAME_* _game_, _POINT_ _id_, char _c_, int8_t _set_, void* (_f_)(void*, _GAME_*, _POINT_, char, _POINT_, int8_t, int8_t)
 );
 
+void* _logic_add_move_(
+    void* _data_, _GAME_* _game_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
+);
+
+void* _logic_add_jump_(
+    void* _data_, _GAME_* _game_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
+);
+
+
+
 typedef struct {
     size_t _w_, _h_; void** _data_; size_t _cnt_;
 } _MASK_;
@@ -63,7 +73,13 @@ bool _logic_is_jump_at_least_all_(
     _GAME_* _game_, bool _turn_
 );
 
-#include "game.h"
+
+
+bool _logic_find_checker_all_(
+    void* _data_, _GAME_* _game_, bool _turn_
+);
+
+
 
 bool _logic_create_(
     _GAME_* _game_
@@ -73,8 +89,14 @@ bool _logic_destroy_(
     _GAME_* _game_
 );
 
+/**
+ * @brief a function that implements the logic and rules of the game. this function is the most important function available on the server
+ *
+ * as a parameter, the function takes the coordinates of cells A and B.
+ * a cell A is a cell on which a checker standing. a cell B is a cell on which you need to move a checker.
+ */
 bool _logic_step_(
-    _GAME_* _game_, _POINT_ _old_, _POINT_ _new_, _STEP_* _step_
+    _GAME_* _game_, _POINT_ _p_old_, _POINT_ _p_new_, _STEP_* _step_, _DATA_* _update_
 );
 
 #endif // _LOGIC_H_

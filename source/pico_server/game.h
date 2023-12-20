@@ -17,7 +17,7 @@ enum _eFlag_ {
 
 //! structure that store information about the game
 struct _sGame_ {
-    _BOARD_ _board_;
+    _BOARD_ _board_; _STEP_ _mem_;
 
     union {
         struct _sFlag_ {
@@ -26,11 +26,7 @@ struct _sGame_ {
 
         int8_t _flag_i_;
     };
-
-    _STEP_ _mem_;
-};
-
-typedef struct _sGame_ _GAME_;
+}; typedef struct _sGame_ _GAME_;
 
 
 
@@ -61,6 +57,10 @@ bool _game_create_(
 //! free allocated memory
 bool _game_destroy_(
     _GAME_* _game_
+);
+
+bool _game_copy_(
+    _GAME_* _dest_, const _GAME_* _source_
 );
 
 #endif // _GAME_H_

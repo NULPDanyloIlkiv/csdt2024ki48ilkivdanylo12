@@ -12,13 +12,13 @@ void _game_step_(
 ) {
     char _c_ = '.';
 
-    _POINT_* _p_ = {
+    _POINT_* _p_[] = {
         &_step_._old_, &_step_._new_
     };
 
     for (
         size_t i = 0x0; i < 0x2; i += 0x1
-    ) { _c_ = _set_board_char_(_game_->_board_, _p_[i].x, _p_[i].y, _c_); }
+    ) { _c_ = _set_board_char_(_game_->_board_, _p_[i]->x, _p_[i]->y, _c_); }
 }
 
 
@@ -106,4 +106,43 @@ bool _game_destroy_(_GAME_* _game_) {
     }
 
     return(_b_);
+}
+
+bool _game_copy_(
+    _GAME_* _dest_, const _GAME_* _source_
+) {
+    _dest_->_flag_i_ = _source_->_flag_i_;
+
+    _dest_->_mem_ = _source_->_mem_;
+
+
+
+    _BOARD_ _board_ = _source_->_board_;
+
+    const uint8_t
+        _w_ = _board_._w_,
+        _h_ = _board_._h_;
+
+    const char* _data_ = _board_._data_;
+
+    const size_t
+        _size_ = _w_ * _h_;
+
+
+
+    _dest_->_board_._w_ = _w_, _dest_->_board_._h_ = _h_;
+
+    _dest_->_board_._data_ = calloc(
+        _size_, sizeof(char)
+    );
+
+    memcpy(
+        _dest_->_board_._data_, _data_, _size_
+    );
+
+
+
+    return(
+        _dest_->_board_._data_ != NULL
+    );
 }
