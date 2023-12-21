@@ -221,6 +221,32 @@ _MASK_ _logic_find_move_all_(
 
 
 
+static void* _logic_is_move_(
+    void* _data_, _GAME_* _game_, _POINT_ _id_, char _c_, _POINT_ _p_, int8_t x, int8_t y
+) {
+    bool* _b_ = (bool*)_data_;
+
+    *(_b_) |= _logic_is_move_one_(_game_, _id_, _c_, _p_);
+
+    return(_data_);
+}
+
+bool _logic_is_move_all_(
+    _GAME_* _game_, _POINT_ _id_, char _c_
+) {
+    bool _b_ = 0x0;
+
+    int8_t _set_ = _logic_set_move_(_c_);
+
+    (void)_logic_all_(
+        &_b_, _game_, _id_, _c_, _set_, &_logic_is_move_
+    );
+
+    return(_b_);
+}
+
+
+
 static _MASK_ _logic_clear_jump_(
     _MASK_ _data_
 )
@@ -348,11 +374,7 @@ bool _logic_is_jump_at_least_all_(
             !(_turn_) ? (_c_ != 'W' && _c_ != 'Q') : (_c_ != 'B' && _c_ != 'K')
         ) { continue; }
 
-        int8_t _set_ = _logic_set_jump_(_c_);
-
-        (void)_logic_all_(
-            &_b_, _game_, (_POINT_){ x, y }, _c_, _set_, &_logic_is_jump_
-        );
+        _b_ = _logic_is_jump_all_(_game_, (_POINT_){ x, y }, _c_);
 
         if (_b_) { return(_b_); }
     }
@@ -389,6 +411,32 @@ bool _logic_find_checker_all_(
     return(
         _checker_->_cnt_ != 0x0
     );
+}
+
+
+
+static bool _logic_is_game_over_(
+    _GAME_* _game_, bool _turn_
+) {
+    bool _b_ = 0x0;
+
+    for (int8_t y = 0x0; y < _game_->_board_._h_; y += 0x1)
+    for (int8_t x = 0x0; x < _game_->_board_._h_; x += 0x1)
+    {
+        char _c_ = _get_board_char_(_game_->_board_, x, y);
+
+        if (
+            !(_turn_) ? (_c_ != 'W' && _c_ != 'Q') : (_c_ != 'B' && _c_ != 'K')
+        ) { continue; }
+
+        _b_ |= _logic_is_move_all_(_game_, (_POINT_){ x, y }, _c_);
+
+        _b_ |= _logic_is_jump_all_(_game_, (_POINT_){ x, y }, _c_);
+
+        if (_b_) { return(_b_ ^ 0x1); }
+    }
+
+    return(_b_ ^ 0x1);
 }
 
 
@@ -635,6 +683,11 @@ bool _logic_step_(
         //! else error...
         return(0x0);
     }
+
+    //! check if a game is over
+    _game_->_flag_._game_over_ = _logic_is_game_over_(
+        _game_, _game_->_flag_i_ & _fTURN_
+    );
 
     //! memorize a step that was made
     _game_->_mem_ = (_STEP_){ _p_old_, _p_new_ };

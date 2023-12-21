@@ -12,20 +12,26 @@
  */
 
 enum _eFlag_ {
-    _fTURN_ = 0b0001, _fCOMBO_ = 0b0010
+    _fGAME_OVER_ = 0b0001, _fTURN_ = 0b0010, _fCOMBO_ = 0b0100
 };
 
 //! structure that store information about the game
 struct _sGame_ {
-    _BOARD_ _board_; _STEP_ _mem_;
+    _BOARD_ _board_;
 
     union {
         struct _sFlag_ {
-            bool _turn_ : 1; bool _combo_ : 1;
+            bool _game_over_ : 1;
+
+            bool _turn_ : 1;
+
+            bool _combo_ : 1;
         } _flag_;
 
         int8_t _flag_i_;
     };
+
+    _STEP_ _mem_;
 }; typedef struct _sGame_ _GAME_;
 
 
