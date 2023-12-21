@@ -1,0 +1,36 @@
+var data_8h =
+[
+    [ "_sInit_", "struct__s_init__.html", "struct__s_init__" ],
+    [ "_sPoint_", "struct__s_point__.html", "struct__s_point__" ],
+    [ "_sStep_", "struct__s_step__.html", "struct__s_step__" ],
+    [ "_sBoard_", "struct__s_board__.html", "struct__s_board__" ],
+    [ "_sChecker_", "struct__s_checker__.html", "struct__s_checker__" ],
+    [ "_sUpdate_", "struct__s_update__.html", "struct__s_update__" ],
+    [ "_sData_", "struct__s_data__.html", "struct__s_data__" ],
+    [ "_MSG_SIZE_", "data_8h.html#a979ec0fbb47c312e7ed9e227462e7318", null ],
+    [ "_BOARD_", "data_8h.html#a6c185b396986ce2c558bb8fada01630f", null ],
+    [ "_CHECKER_", "data_8h.html#a03c82c1357b38573a7126010ac4a2ca4", null ],
+    [ "_DATA_", "data_8h.html#a593a5316ce43a257d6c682359f152a24", null ],
+    [ "_INIT_", "data_8h.html#a0a87a632ee127f165ee98e4245c1c350", null ],
+    [ "_KEY_", "data_8h.html#a625185b89e566af0b9fb38fe662ad4ea", null ],
+    [ "_POINT_", "data_8h.html#ae8f633c6790ffcb90d0facf8aebd5a78", null ],
+    [ "_STEP_", "data_8h.html#a00a9cf245e5c2fde9b7c014117eaaec3", null ],
+    [ "_UPDATE_", "data_8h.html#a479bb2e17f393df1718bccae31f70a74", null ],
+    [ "_eKey_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fd", [
+      [ "_kERROR_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fda471df9abbd093f205bc304dba6252aae", null ],
+      [ "_kINIT_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fdade3de7d97df01ca74190edea4a3faf94", null ],
+      [ "_kTURN_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fdad5ca957234a8f6bcac4cbec8b53daa73", null ],
+      [ "_kSTEP_MAKE_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fdad4e2f962ef6ac15e810c1e077d6e1532", null ],
+      [ "_kSTEP_BOT_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fda8a00b32bb4ed3874672fb51f94864cc5", null ],
+      [ "_kSTEP_TAKE_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fda584b0224e3503b6e814ee2d1b0b51833", null ],
+      [ "_kUPDATE_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fdad28f1ddc016fa2453c4f9201abf2e9bb", null ],
+      [ "_kMESSAGE_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fdabdf19cc1c8ba5bb405ed0305056a7cdc", null ],
+      [ "_kRESTART_", "data_8h.html#a6e01005324798ad66aaa5b4ffdbf42fda0db84de1d6e5e8e84d2d977383aa5048", null ]
+    ] ],
+    [ "_data_add_", "data_8h.html#a077b7f2095f98809da5d10facbd7a07e", null ],
+    [ "_data_clear_", "data_8h.html#a08cd12ec20b87041fdcfa014bedce2d4", null ],
+    [ "_data_sub_", "data_8h.html#a79b93f41a98309a220b2c5b38d8960e7", null ],
+    [ "_get_board_char_", "data_8h.html#aef890210fdc4e93a87384d20d55bef14", null ],
+    [ "_is_inside_board_", "data_8h.html#add3ab9ff7dba609993b028f311073a17", null ],
+    [ "_set_board_char_", "data_8h.html#a55973764142b02ac5a318fc8eb5a42d8", null ]
+];
