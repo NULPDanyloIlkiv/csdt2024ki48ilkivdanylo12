@@ -1,4 +1,0 @@
-var dir_db6d944a98e96ac599d39d662b075769 =
-[
-    [ "rp2040", "dir_e8ac4dbf546a9448a18265a63827747a.html", "dir_e8ac4dbf546a9448a18265a63827747a" ]
-];
