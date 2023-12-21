@@ -10,39 +10,44 @@
 
 #include "logic.h"
 
-static const int32_t _W_or_B_value_ = 128, _Q_or_K_value_ = 512;
+static const int8_t _alive_value_ = 0x3;
+
+static const int32_t _W_or_B_value_ = 64, _Q_or_K_value_ = 128;
 
 static const int32_t _Y_value_[] = {
-    0x2, 0x2, 0x2, 0x1, 0x1, 0x1, 0x4, 0x6
+    0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1
 };
 
 static int32_t _pay_(
-    int x, int y, char _c_, int32_t _val_, bool _state_
+    int x, int y, char _c_, bool _turn_
 ) {
-    int8_t _sign_ = _state_ ? -0x1 : +0x1;
+    int32_t _val_ = 0x0;
+
+    int8_t _sign_ = _turn_ ? -0x1 : +0x1;
 
     switch(_c_)
     {
+
     case('W'): {
         _val_ += _sign_ * (
             _Y_value_[y] * _W_or_B_value_
-        );
+        ) * _turn_ ? 0x1 : _alive_value_;
     } break;
     case('B'): {
         _val_ -= _sign_ * (
             _Y_value_[(_gSIZE_H_ - 0x1) - y] * _W_or_B_value_
-        );
+        ) * _turn_ ? _alive_value_ : 0x1;
     } break;
 
     case('Q'): {
         _val_ += _sign_ * (
             _Y_value_[y] * _Q_or_K_value_
-        );
+        ) * _turn_ ? 0x1 : _alive_value_;
     } break;
     case('K'): {
         _val_ -= _sign_ * (
             _Y_value_[(_gSIZE_H_ - 0x1) - y] * _Q_or_K_value_
-        );
+        ) * _turn_ ? _alive_value_ : 0x1;
     } break;
 
     default:
@@ -55,7 +60,7 @@ static int32_t _pay_(
 static int32_t _minimax_(
     _GAME_ _game_, bool _turn_, _POINT_* _p_old_, _POINT_* _p_new_, int8_t _depth_, bool _min_max_
 ) {
-    int32_t _infinity_ = INT_MAX * (_min_max_ ? -0x1 : +0x1);
+    int32_t _infinity_ = _min_max_ ? INT_MIN : INT_MAX;
 
     if (!_depth_) {
         int32_t _score_ = 0x0;
@@ -68,7 +73,7 @@ static int32_t _minimax_(
             );
 
             _score_ += _pay_(
-                x, y, _c_, _score_, _min_max_ ^ _turn_
+                x, y, _c_, _turn_
             );
         }
 
@@ -85,17 +90,15 @@ static int32_t _minimax_(
 
     enum _eStep_ { _eJUMP_ = 0x0, _eMOVE_ = 0x1, _eSIZE_ };
 
-    int32_t _max_score_ = 0x0;
+    int32_t _min_max_score_ = _infinity_;
 
     for (
         int8_t j = 0x0; j < _eSIZE_; j += 0x1
     ) {
-        _max_score_ = _infinity_;
-
         _DATA_ _checker_ = {}, _step_ = {};
 
         if (
-            !_logic_find_checker_all_(&_checker_, &_game_, _turn_)
+            !_logic_find_checker_all_(&_checker_, &_game_, _game_._flag_i_ & _fTURN_)
         ) { return(_infinity_); }
 
         for (
@@ -131,21 +134,23 @@ static int32_t _minimax_(
 
             _DATA_ _update_ = {};
 
+            bool _old_turn_ = _virtual_._flag_i_ & _fTURN_;
+
             _logic_step_(
                 &_virtual_, _s_in_._old_, _s_in_._new_, &_s_out_, &_update_
             );
 
-
+            bool _new_turn_ = _virtual_._flag_i_ & _fTURN_;
 
             int32_t _score_ = _minimax_(
-                _virtual_, _virtual_._flag_i_ & _fTURN_, &_s_in_._old_, &_s_in_._new_, _depth_ - 0x1, _turn_ != (_virtual_._flag_i_ & _fTURN_) ? (_min_max_ ^ 0x1) : _min_max_
+                _virtual_, _turn_, &_s_in_._old_, &_s_in_._new_, _depth_ - 0x1, _old_turn_ != _new_turn_ ? (_min_max_ ^ 0x1) : _min_max_
             );
 
             if (
-                _min_max_ ? _score_ >= _max_score_ : _score_ <= _max_score_
+                _min_max_ ? _score_ >= _min_max_score_ : _score_ <= _min_max_score_
             ) { *(_p_old_) = _s_out_._old_, *(_p_new_) = _s_out_._new_; }
 
-            _max_score_ = _min_max_ ? MAX(_score_, _max_score_) : MIN(_score_, _max_score_);
+            _min_max_score_ = _min_max_ ? MAX(_score_, _min_max_score_) : MIN(_score_, _min_max_score_);
 
 
 
@@ -168,7 +173,7 @@ static int32_t _minimax_(
     }
 
 linkExit:
-    return(_max_score_);
+    return(_min_max_score_);
 }
 
 static void _random_(
@@ -254,7 +259,7 @@ bool _bot_step_(
         return(0x0);
     }
 
-    _minimax_(_virtual_, _turn_, _p_old_, _p_new_, 0x3, true);
+    _minimax_(_virtual_, _turn_, _p_old_, _p_new_, 0x3, !_turn_);
 
     if (
         !_game_destroy_(&_virtual_)
