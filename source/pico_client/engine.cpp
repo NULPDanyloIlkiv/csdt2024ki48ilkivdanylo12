@@ -258,6 +258,9 @@ LRESULT _cEngine_::HandleMessage(UINT _In_ uMsg,
         } break;
 
         case(VK_TAB): {
+            if (select) {
+                select = nullptr;
+            }
 #ifdef _COM_PORT_
             client->_step_bot_();
 

@@ -7,18 +7,18 @@
  */
 
 //! make a step on a board
-void _game_step_(
+void _game_step_make_(
     _GAME_* _game_, _STEP_ _step_
 ) {
     char _c_ = '.';
 
-    _POINT_* _p_[] = {
-        &_step_._old_, &_step_._new_
+    _POINT_ _p_[] = {
+        _step_._old_, _step_._new_
     };
 
     for (
         size_t i = 0x0; i < 0x2; i += 0x1
-    ) { _c_ = _set_board_char_(_game_->_board_, _p_[i]->x, _p_[i]->y, _c_); }
+    ) { _c_ = _set_board_char_(_game_->_board_, _p_[i].x, _p_[i].y, _c_); }
 }
 
 
@@ -56,6 +56,27 @@ bool _game_turn_(
     }
 
     return(_b_);
+}
+
+
+
+//! cancel a update on a board
+void _game_update_cancel_(
+    _GAME_* _game_, _UPDATE_ _update_
+) {
+    _update_._new_._c_ = '.';
+
+    _CHECKER_ _ch_[] = {
+        _update_._new_, _update_._old_
+    };
+
+    for (
+        size_t i = 0x0; i < 0x2; i += 0x1
+    ) {
+        (void)_set_board_char_(
+            _game_->_board_, _ch_[i]._id_.x, _ch_[i]._id_.y, _ch_[i]._c_
+        );
+    }
 }
 
 

@@ -98,6 +98,12 @@ size_t _data_add_(
     _DATA_* _data_, size_t _size_
 );
 
-size_t _data_clear_(_DATA_* _data_);
+size_t _data_sub_(
+	_DATA_* _data_, size_t _size_
+);
+
+size_t _data_clear_(
+	_DATA_* _data_
+);
 
 #endif // _DATA_H_
