@@ -415,7 +415,7 @@ bool _logic_find_checker_all_(
 
 
 
-static bool _logic_is_game_over_(
+bool _logic_is_game_over_(
     _GAME_* _game_, bool _turn_
 ) {
     bool _b_ = 0x0;
