@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['_5fboard_5f_371',['_board_',['../struct__s_game__.html#a13588a056d155a55830e2d5c44aac294',1,'_sGame_']]],
+  ['_5fc_5f_372',['_c_',['../struct__s_checker__.html#a2f2a0c238a09cc2248f0a8f54c90ce0b',1,'_sChecker_']]],
+  ['_5fcnt_5f_373',['_cnt_',['../struct__s_data__.html#afa683de30d1ad1ff088e13cc751f630f',1,'_sData_::_cnt_()'],['../struct___m_a_s_k__.html#afa683de30d1ad1ff088e13cc751f630f',1,'_MASK_::_cnt_()']]],
+  ['_5fcombo_5f_374',['_combo_',['../struct__s_game__.html#ab0fa804bfaaf17668616fb56ddc8334b',1,'_sGame_']]],
+  ['_5fdata_5f_375',['_data_',['../struct__s_board__.html#a34b8d0c977c6acd6087c2bd6d5336c74',1,'_sBoard_::_data_()'],['../struct__s_data__.html#ad325e0aafbd8ad69d7fef0b8b2c6892d',1,'_sData_::_data_()'],['../struct___m_a_s_k__.html#afdd581bfbf2ca324edd3c6f282f182d9',1,'_MASK_::_data_()']]],
+  ['_5fflag_5f_376',['_flag_',['../struct__s_game__.html#abfe6d77b0db2dc10fe3da252f4569a3b',1,'_sGame_']]],
+  ['_5fflag_5fi_5f_377',['_flag_i_',['../struct__s_game__.html#a0db9baaded6e41b7cc815310af8d1340',1,'_sGame_']]],
+  ['_5fgame_5fover_5f_378',['_game_over_',['../struct__s_game__.html#af07ca381ce930902a59e5770742c460b',1,'_sGame_']]],
+  ['_5fgled_5fpin_5f_379',['_gLED_PIN_',['../main_8c.html#a3c6fd317a0393f1ddd677d9507e712d8',1,'main.c']]],
+  ['_5fh_5f_380',['_h_',['../struct__s_board__.html#ae90da29cde06ef8d83e9bf58960efdaf',1,'_sBoard_::_h_()'],['../struct___m_a_s_k__.html#aef4bd7f29063d18ec770564cc6ac290f',1,'_MASK_::_h_()']]],
+  ['_5fid_5f_381',['_id_',['../struct__s_checker__.html#a22f19892ceb5d0a10cb34e165047277c',1,'_sChecker_']]],
+  ['_5fmem_5f_382',['_mem_',['../struct__s_game__.html#abfc3d60b0b8820d40fba547c2166ff8e',1,'_sGame_']]],
+  ['_5fnew_5f_383',['_new_',['../struct__s_step__.html#aa67e78cc55a83527b9f620800a5138fd',1,'_sStep_::_new_()'],['../struct__s_update__.html#ab12a853d8fdc723d6bc4bda6c7d1f447',1,'_sUpdate_::_new_()']]],
+  ['_5fold_5f_384',['_old_',['../struct__s_step__.html#a073742db93abac0d8d7ae89d8c6a97e6',1,'_sStep_::_old_()'],['../struct__s_update__.html#ae9b55eb8b3bddcbd5af30c8d0ef1476e',1,'_sUpdate_::_old_()']]],
+  ['_5fsize_5fh_5f_385',['_size_h_',['../struct__s_init__.html#a1500614e83c3a2a3957fc177e065bd44',1,'_sInit_']]],
+  ['_5fsize_5fw_5f_386',['_size_w_',['../struct__s_init__.html#aa39963898e869674e964417b0f1c135d',1,'_sInit_']]],
+  ['_5fturn_5f_387',['_turn_',['../struct__s_game__.html#ad7ff18a18d944d3cf3963d9bb81be89a',1,'_sGame_']]],
+  ['_5fw_5f_388',['_w_',['../struct__s_board__.html#a7cbe9a333ba5c2edbdd9cfdbcf1aa6f9',1,'_sBoard_::_w_()'],['../struct___m_a_s_k__.html#a49898075fbfbb9372abed7ec0b98e638',1,'_MASK_::_w_()']]]
+];
