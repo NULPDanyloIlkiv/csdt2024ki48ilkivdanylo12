@@ -81,6 +81,12 @@ bool _logic_find_checker_all_(
 
 
 
+bool _logic_is_game_over_(
+    _GAME_* _game_, bool _turn_
+);
+
+
+
 bool _logic_create_(
     _GAME_* _game_
 );
